@@ -9,12 +9,10 @@
 
 VENV_DIR=/c/Users/ruair/.platformio
 MARLIN_DIR=/c/exit/doc/BIGTREETECH-SKR-mini-E3-V1.2/Marlin
-PYTHON_DIR=/c/Users/ruair/.platformio/python3/
 
+${VENV_DIR}/python3/python -m venv ${VENV_DIR}
 
-${PYTHON_DIR}/python -m venv ${VENV_DIR}
-
-${PYTHON_DIR}/Scripts/pip install -U platformio --no-cache-dir
+${VENV_DIR}/python3/Scripts/pip install -U platformio --no-cache-dir
 
 
 
@@ -233,7 +231,7 @@ sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN         PC14@g' ${MARLIN_DIR
 
 
 
-(cd ${MARLIN_DIR}; ../${VENV_DIR}/bin/platformio run)
+(cd ${MARLIN_DIR}; ${VENV_DIR}/penv/Scripts/platformio run)
 
 grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 

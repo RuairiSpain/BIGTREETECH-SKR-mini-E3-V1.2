@@ -26,7 +26,7 @@ git -C ${MARLIN_DIR} revert --no-edit 1c9ccce5209cd1727bf80e632f4f781c651e0c35
 
 
 
-sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
+#sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
 
 sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree@' ${MARLIN_DIR}/platformio.ini
 
@@ -218,6 +218,7 @@ sed -i 's@/*#define Z_SAFE_HOMING@#define Z_SAFE_HOMING@' ${MARLIN_DIR}/Marlin/C
 sed -i 's@/*#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
+sed -i 's@/.*#define SHOW_BOOTSCREEN@#define FILAMENT_UNLOAD_PURGE_FEEDRATE 25@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 # use probe connector as z-endstop connector
 sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN         PC14@g' ${MARLIN_DIR}/Marlin/src/pins/stm32/pins_BTT_SKR_MINI_E3.h

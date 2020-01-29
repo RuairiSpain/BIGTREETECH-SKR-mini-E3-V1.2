@@ -7,14 +7,14 @@
 
 
 
-VENV_DIR=PlatformIO
-MARLIN_DIR=Marlin
+VENV_DIR=/c/Users/ruair/.platformio
+MARLIN_DIR=/c/exit/doc/BIGTREETECH-SKR-mini-E3-V1.2/Marlin
+PYTHON_DIR=/c/Users/ruair/.platformio/python3/
 
 
+${PYTHON_DIR}/python -m venv ${VENV_DIR}
 
-python3 -m venv ${VENV_DIR}
-
-./${VENV_DIR}/bin/pip install -U platformio --no-cache-dir
+${PYTHON_DIR}/Scripts/pip install -U platformio --no-cache-dir
 
 
 
@@ -187,8 +187,8 @@ sed -i 's@#define HEATER_0_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@g' ${MARLIN_
 
 
 # modernize pla preset
-sed -i 's@#define PREHEAT_1_TEMP_HOTEND .*@#define PREHEAT_1_TEMP_HOTEND 205@g' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define PREHEAT_1_TEMP_BED .*@#define PREHEAT_1_TEMP_BED     60@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define PREHEAT_1_TEMP_HOTEND .*@#define PREHEAT_1_TEMP_HOTEND 215@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define PREHEAT_1_TEMP_BED .*@#define PREHEAT_1_TEMP_BED     70@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 
@@ -206,8 +206,8 @@ sed -i 's@/*#define BLTOUCH@#define BLTOUCH@' ${MARLIN_DIR}/Marlin/Configuration
 sed -i 's@/*#define LCD_BED_LEVELING@#define LCD_BED_LEVELING@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define AUTO_BED_LEVELING_BILINEAR@#define AUTO_BED_LEVELING_BILINEAR@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 3@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { -44, -6, 0 }@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@/*#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 44@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { -60, -12, 0 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@/*#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 60@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define EXTRAPOLATE_BEYOND_GRID@#define EXTRAPOLATE_BEYOND_GRID@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_Z .*@  #define BABYSTEP_MULTIPLICATOR_Z 5@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_XY .*@  #define BABYSTEP_MULTIPLICATOR_XY 5@' ${MARLIN_DIR}/Marlin/Configuration_adv.h

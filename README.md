@@ -1,10 +1,11 @@
 # BigTreeTech SKR-mini-E3 V1.2
 
+Amended for custom E3 with Hydra Fan system https://www.thingiverse.com/thing:4062242
 **WARNING:** Firmware in this repository is provided as-is, **use at your own risk**.
 
 **TIP:** If you're having issues updating your SKR mini E3 firmware, try reformatting your SD card.
 
-## BLTouch (__REQUIRED__)
+## BLTouch (**REQUIRED**)
 
 **CRITICAL:** The BLTouch bed levelling sensor should be connected to the `PROBE` (and `SERVO`) headers,
 and triple check the actual pinouts before powering on the board.
@@ -14,7 +15,7 @@ and triple check the actual pinouts before powering on the board.
 **INFO:** `Z_MAX_POS` has been limited to 235, to account for thicker print beds.
 
 **INFO:** The precompiled firmware.bin presumes the use of Creality's official metal mounting bracket,
-resulting in sensor-to-nozzle offsets of roughly -44mm, -6mm, -2mm (X, Y, Z).
+resulting in sensor-to-nozzle offsets of roughly -60mm, -12mm, -2mm (X, Y, Z).
 
 **TIP:** The precompiled firmware.bin was tested using a genuine BLTouch SMART 3.1, if you are
 getting inconsistent behavior, try adjusting the magnet inside the BLTouch using the hexnut
@@ -50,7 +51,7 @@ Maximum heated-bed temperature has been limited to 80C for increased safety.
 
 ## Initial Setup
 
-After flashing the precompiled firmware.bin, if desired, you should (re-)calibrate 
+After flashing the precompiled firmware.bin, if desired, you should (re-)calibrate
 your extruder (E-steps) first. Keep in mind that Creality's default 93 E-steps
 purposefully slightly underextrudes, which typically benefits your prints
 optical quality.
@@ -106,4 +107,4 @@ M84 X Y E ; disable motors
 
 ## Recommended printable upgrades
 
-- [Ender 3 Cooling fan mod (CNC Kitchen)](https://www.thingiverse.com/thing:3437925)
+-   [Ender 3 Cooling fan mod (CNC Kitchen)](https://www.thingiverse.com/thing:3437925)

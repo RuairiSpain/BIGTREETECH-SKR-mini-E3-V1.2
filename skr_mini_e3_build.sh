@@ -11,9 +11,7 @@ VENV_DIR=/c/Users/ruair/.platformio
 MARLIN_DIR=/c/exit/doc/BIGTREETECH-SKR-mini-E3-V1.2/Marlin
 
 ${VENV_DIR}/penv/Scripts/python -m venv ${VENV_DIR}
-
 ${VENV_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
-
 
 
 git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
@@ -28,7 +26,7 @@ git -C ${MARLIN_DIR} log -1
 
 #sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
 
-sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree_512K@' ${MARLIN_DIR}/platformio.ini
+#git remote add origin git@github.com:RuairiSpain/Marlin2.gitsed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree_512K@' ${MARLIN_DIR}/platformio.ini
 
 
 
@@ -57,7 +55,7 @@ sed -i 's@.*#define CR10_STOCKDISPLAY@#define CR10_STOCKDISPLAY@' ${MARLIN_DIR}/
 
 sed -i 's@.*#define SPEAKER@//#define SPEAKER@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-
+sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 93 }.*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 105.68 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 # discovered from BigTreeTech reference firmware sources
 sed -i 's@#if HAS_TMC220x && !defined(TARGET_LPC1768) && ENABLED(ENDSTOP_INTERRUPTS_FEATURE)@& \&\& !defined(TARGET_STM32F1)@g' ${MARLIN_DIR}/Marlin/src/inc/SanityCheck.h
@@ -204,7 +202,7 @@ sed -i 's@/*#define BLTOUCH@#define BLTOUCH@' ${MARLIN_DIR}/Marlin/Configuration
 sed -i 's@/*#define LCD_BED_LEVELING@#define LCD_BED_LEVELING@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define AUTO_BED_LEVELING_BILINEAR@#define AUTO_BED_LEVELING_BILINEAR@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 3@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { -60, -12, 0 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { -60, -12, -2.55 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 60@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define EXTRAPOLATE_BEYOND_GRID@#define EXTRAPOLATE_BEYOND_GRID@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_Z .*@  #define BABYSTEP_MULTIPLICATOR_Z 5@' ${MARLIN_DIR}/Marlin/Configuration_adv.h

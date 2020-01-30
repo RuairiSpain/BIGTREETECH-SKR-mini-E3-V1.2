@@ -29,7 +29,7 @@ git -C ${MARLIN_DIR} log -1
 
 
 
-sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
+#sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
 
 #git remote add origin git@github.com:RuairiSpain/Marlin2.git
 
@@ -37,13 +37,15 @@ sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree_512K@' ${MARLIN_D
 
 
 
-cp "${MARLIN_DIR}/config/examples/Creality/Ender-3/Configuration.h" "${MARLIN_DIR}/Marlin"
-cp "${MARLIN_DIR}/config/examples/Creality/Ender-3/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
-#cp "${MARLIN_DIR}/config/examples/BigTreeTech/SKR Mini E3 1.2/Configuration.h" "${MARLIN_DIR}/Marlin"
-#cp "${MARLIN_DIR}/config/examples/BigTreeTech/SKR Mini E3 1.2/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
+#cp "${MARLIN_DIR}/config/examples/Creality/Ender-3/Configuration.h" "${MARLIN_DIR}/Marlin"
+#cp "${MARLIN_DIR}/config/examples/Creality/Ender-3/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
+cd Marlin
+git checkout remotes/origin/2.0.x "config/examples/BigTreeTech/SKR Mini E3 1.2/Configuration.h"
+git checkout remotes/origin/2.0.x "config/examples/BigTreeTech/SKR Mini E3 1.2/Configuration_adv.h"
+cd ..
+cp "${MARLIN_DIR}/config/examples/BigTreeTech/SKR Mini E3 1.2/Configuration.h" "${MARLIN_DIR}/Marlin"
+cp "${MARLIN_DIR}/config/examples/BigTreeTech/SKR Mini E3 1.2/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
 git -C ${MARLIN_DIR} commit -a -m "base example config"
-
-
 
 sed -i 's@#define SERIAL_PORT .*@#define SERIAL_PORT 2@' ${MARLIN_DIR}/Marlin/Configuration.h
 

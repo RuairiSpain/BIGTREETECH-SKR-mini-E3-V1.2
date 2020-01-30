@@ -18,17 +18,17 @@ ${VENV_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
 
 git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 
-#git -C ${MARLIN_DIR} checkout bugfix-2.0.x
+git -C bugfix-2.0.x${MARLIN_DIR} checkout bugfix-2.0.x
 
 git -C ${MARLIN_DIR} log -1
 
-git -C ${MARLIN_DIR} revert --no-edit 1c9ccce5209cd1727bf80e632f4f781c651e0c35
+#git -C ${MARLIN_DIR} revert --no-edit 1c9ccce5209cd1727bf80e632f4f781c651e0c35
 
 
 
 #sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
 
-sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree@' ${MARLIN_DIR}/platformio.ini
+sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree_512K@' ${MARLIN_DIR}/platformio.ini
 
 
 
@@ -237,4 +237,4 @@ sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN         PC14@g' ${MARLIN_DIR
 grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 
 ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.bin
-cp ${MARLIN_DIR}/.pio/build/STM32F103RC_bigtree/firmware.bin .
+cp Marlin/.pio/build/STM32F103RC_bigtree_512K/firmware.bin .

@@ -14,9 +14,14 @@ ${VENV_DIR}/penv/Scripts/python -m venv ${VENV_DIR}
 ${VENV_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
 
 
-git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
-
-git -C bugfix-2.0.x${MARLIN_DIR} checkout bugfix-2.0.x
+//git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
+cd Marlin
+git add .
+git commit -m "Updates"
+git push
+git status
+git checkout -b upstream/bugfix-2.0.x
+cd ..
 
 git -C ${MARLIN_DIR} log -1
 
@@ -24,9 +29,11 @@ git -C ${MARLIN_DIR} log -1
 
 
 
-#sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
+sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
 
-#git remote add origin git@github.com:RuairiSpain/Marlin2.gitsed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree_512K@' ${MARLIN_DIR}/platformio.ini
+#git remote add origin git@github.com:RuairiSpain/Marlin2.git
+
+sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree_512K@' ${MARLIN_DIR}/platformio.ini
 
 
 
@@ -76,8 +83,8 @@ sed -i 's@.*#define ARC_SUPPORT@//#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Con
 
 
 # personal tweaks
-sed -i 's@#define STRING_CONFIG_H_AUTHOR .*@#define STRING_CONFIG_H_AUTHOR "(SKR mini E3)"@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "SKR mini E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define STRING_CONFIG_H_AUTHOR .*@#define STRING_CONFIG_H_AUTHOR "Lapido SKR E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "Lapido"@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define SHOW_BOOTSCREEN@//#define SHOW_BOOTSCREEN@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define SHOW_CUSTOM_BOOTSCREEN@//#define SHOW_CUSTOM_BOOTSCREEN@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IMAGE@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -87,9 +94,16 @@ sed -i 's@.*#define LEVEL_CORNERS_INSET .*@  #define LEVEL_CORNERS_INSET 33@g' $
 
 sed -i 's@.*#define JUNCTION_DEVIATION_MM .*@  #define JUNCTION_DEVIATION_MM 0.04@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
-sed -i 's@.*#define S_CURVE_ACCELERATION@//#define S_CURVE_ACCELERATION@g' ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i 's@.*#define S_CURVE_ACCELERATION@//#define S_CURVE_ACCELERATION@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define LIN_ADVANCE@#define LIN_ADVANCE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define LIN_ADVANCE_K .*@  #define LIN_ADVANCE_K 0.50@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+sed -i 's@/.*#define Z_MIN_PROBE_REPEATABILITY_TEST@  #define Z_MIN_PROBE_REPEATABILITY_TEST@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@/.*#define RESTORE_LEVELING_AFTER_G28@  #define RESTORE_LEVELING_AFTER_G28@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define GRID_MAX_POINTS_X 3@  #define GRID_MAX_POINTS_X 5@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE - 60) / 2)@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE - 20) / 2)@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@/.*#define NOZZLE_CLEAN_FEATURE@  #define NOZZLE_CLEAN_FEATURE@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
 sed -i 's@.*#define ENDSTOPS_ALWAYS_ON_DEFAULT@#define ENDSTOPS_ALWAYS_ON_DEFAULT@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 

@@ -21,7 +21,7 @@ git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 cd ${MARLIN_DIR}
 git add .
 git commit -m "Updates"
-git push -uqf origin origin/${BRANCH}
+#git push -uqf origin origin/${BRANCH}
 git status
 git checkout -b ${BRANCH}
 curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration.h" --output Configuration.h
@@ -199,7 +199,7 @@ sed -i "s@#define PREHEAT_1_TEMP_BED .*@#define PREHEAT_1_TEMP_BED     70@g" ${M
 
 
 # change abs preset to petg
-sed -i "s@#define PREHEAT_2_LABEL .*@#define PREHEAT_2_LABEL       "PETG"@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define PREHEAT_2_LABEL .*@#define PREHEAT_2_LABEL       "PETG"@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@#define PREHEAT_2_TEMP_HOTEND .*@#define PREHEAT_2_TEMP_HOTEND 240@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@#define PREHEAT_2_TEMP_BED .*@#define PREHEAT_2_TEMP_BED     70@g" ${MARLIN_DIR}/Marlin/Configuration.h
 

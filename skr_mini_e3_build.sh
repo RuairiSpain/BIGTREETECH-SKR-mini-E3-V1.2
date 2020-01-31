@@ -34,7 +34,7 @@ cd ..
 
 
 git remote add origin git@github.com:RuairiSpain/Marlin2.git
-if grep -v -Fxq "PlatformIO" ${MARLIN_DIR}/platformio.ini
+if grep -Fxq "PlatformIO" ${MARLIN_DIR}/platformio.ini
 then
   sed -i "s@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
 fi
@@ -251,7 +251,7 @@ grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 
 ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.bin
 
-cp Marlin/.pio/build/${BOARD}/firmware.bin ./firmware${BRANCH##*/}.bin
+cp Marlin/.pio/build/${BOARD}/firmware.bin ./firmware-${BRANCH##*/}.bin
 
 cd ${MARLIN_DIR}
 git add .

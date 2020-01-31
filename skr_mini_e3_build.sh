@@ -27,6 +27,7 @@ curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/con
 curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration_adv.h"  --output Configuration_adv.h
 git -C ${MARLIN_DIR} commit -a -m "base example config"
 
+git remote remove origin/${BRANCH}
 git push -uq origin origin/${BRANCH}
 cd ..
 
@@ -253,6 +254,7 @@ cp Marlin/.pio/build/${BOARD}/firmware.bin ./firmware-${BRANCH##*/}.bin
 cd ${MARLIN_DIR}
 git add .
 git commit -m "New code for ${BOARD} with branch ${BRANCH##*/}"
+git remote remove origin/${BRANCH}
 git push -uq origin origin/${BRANCH}
 git status
 cd ..

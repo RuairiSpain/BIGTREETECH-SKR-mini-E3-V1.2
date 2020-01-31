@@ -34,11 +34,11 @@ cd ..
 
 
 git remote add origin git@github.com:RuairiSpain/Marlin2.git
-if grep -Fxq "PlatformIO" ${MARLIN_DIR}/platformio.ini
+if grep -Fqv "core_dir = PlatformIO" ${MARLIN_DIR}/platformio.ini
 then
   sed -i "s@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
 fi
-if grep -Fxqv "default_envs = ${BOARD}" ${MARLIN_DIR}/platformio.ini
+if grep -Fqv "default_envs = ${BOARD}" ${MARLIN_DIR}/platformio.ini
 then
   sed -i "s@default_envs.*=.*@default_envs = ${BOARD}@" ${MARLIN_DIR}/platformio.ini
 fi
@@ -244,6 +244,7 @@ sed -i "s@/*#define DEBUG_LEVELING_FEATURE@#define DEBUG_LEVELING_FEATURE@g" ${M
 sed -i "s@.*#define TMC_DEBUG@  #define TMC_DEBUG@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
+rm Marlin/.pio/build/${BOARD}/firmware.bin
 
 (cd ${MARLIN_DIR}; ${VENV_DIR}/penv/Scripts/platformio run)
 

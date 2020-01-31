@@ -3,7 +3,7 @@
 # SKR mini E3 V1.2  -  Marlin 2.0  -  firmware build script
 #
 # Copyright (c) 2019-2020 Pascal de Bruijn
-#
+# Amended by Ruairi O'Donnell
 
 
 
@@ -34,7 +34,7 @@ cd ..
 
 
 git remote add origin git@github.com:RuairiSpain/Marlin2.git
-if grep -Fxqv "core_dir = PlatformIO" ${MARLIN_DIR}/platformio.ini
+if grep -v -Fxq "PlatformIO" ${MARLIN_DIR}/platformio.ini
 then
   sed -i "s@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
 fi

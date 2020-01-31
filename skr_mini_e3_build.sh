@@ -5,20 +5,26 @@
 # Copyright (c) 2019-2020 Pascal de Bruijn
 # Amended by Ruairi O'Donnell
 
-
-
-VENV_DIR=/c/Users/ruair/.platformio
-MARLIN_DIR=/c/exit/doc/BIGTREETECH-SKR-mini-E3-V1.2/Marlin
-BRANCH=upstream/dev-2.1.x #upstream/bugfix-2.0.x
+MARLIN_DIR=./Marlin
+SHORT_BRANCH=2.0.3   #dev-2.1.x #bugfix-2.0.x
 BOARD=STM32F103RC_bigtree_512K
+PLATFORMIO_DIR=/c/Users/ruair/.platformio
+
 #https://github.com/MarlinFirmware/Configurations/tree/master/config/examples/Creality/Ender-3
-CONFIGURATION_FOLDER=BigTreeTech/SKR%20Mini%20E3%201.2
+CONFIGURATION_FOLDER="BigTreeTech/SKR Mini E3 1.2"
 CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/
 
 
-SHORT_BRANCH=${BRANCH##*/}
-${VENV_DIR}/penv/Scripts/python -m venv ${VENV_DIR}
-${VENV_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
+CONFIGURATION_FOLDER=$(python -c $'try: import urllib.request as urllib\nexcept: import urllib\nimport sys\nsys.stdout.write(
+urllib.quote(input()))' <<< ${CONFIGURATION_FOLDER})
+
+
+#echo ${CONFIGURATION_FOLDER}
+#echo ${CONFIGURATION_PREFIX}
+
+BRANCH=upstream/${BRANCH}
+${PLATFORMIO_DIR}/penv/Scripts/python -m venv ${PLATFORMIO_DIR}
+${PLATFORMIO_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
 
 if [ ! -d  ${MARLIN_DIR} ]
 then
@@ -29,7 +35,7 @@ cd ${MARLIN_DIR}
 git checkout ${SHORT_BRANCH}
 
 curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration.h" --output Configuration.h
-curl "{CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration_adv.h"  --output Configuration_adv.h
+curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration_adv.h"  --output Configuration_adv.h
 
 cd ..
 
@@ -245,7 +251,7 @@ sed -i "s@.*#define TMC_DEBUG@  #define TMC_DEBUG@" ${MARLIN_DIR}/Marlin/Configu
 
 #rm -rf Marlin/.pio/build/${BOARD}
 
-(cd ${MARLIN_DIR}; ${VENV_DIR}/penv/Scripts/platformio run)
+(cd ${MARLIN_DIR}; ${PLATFORMIO_DIR}/penv/Scripts/platformio run)
 
 grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 

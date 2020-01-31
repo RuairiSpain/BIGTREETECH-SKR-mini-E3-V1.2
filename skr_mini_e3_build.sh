@@ -28,8 +28,8 @@ fi
 cd ${MARLIN_DIR}
 git checkout ${SHORT_BRANCH}
 
-curl '${CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration.h' --output Configuration.h
-curl '{CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration_adv.h'  --output Configuration_adv.h
+curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration.h" --output Configuration.h
+curl "{CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration_adv.h"  --output Configuration_adv.h
 
 cd ..
 
@@ -254,13 +254,13 @@ ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.bin
 cp Marlin/.pio/build/${BOARD}/firmware.bin ./firmware-${SHORT_BRANCH}.bin
 
 cd ${MARLIN_DIR}
-git checkout -B origin/${SHORT_BRANCH}
+git checkout -t backup/${SHORT_BRANCH}
 git add .
 git commit -m "New code for ${BOARD} with branch ${SHORT_BRANCH}"
-git push -uq origin origin/${SHORT_BRANCH}
+git push
 git status
 cd ..
-git checkout -B origin/${SHORT_BRANCH}
+git checkout -t origin/${SHORT_BRANCH}
 git add .
 git commit -m "New build for ${SHORT_BOARD} with branch ${SHORT_BRANCH}"
 git push

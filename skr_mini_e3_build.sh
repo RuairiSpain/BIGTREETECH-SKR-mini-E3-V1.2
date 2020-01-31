@@ -30,14 +30,10 @@ git push -f tags
 git push -uq origin origin/${BRANCH}
 cd ..
 
-#git -C ${MARLIN_DIR} log -1
-
-
 git remote add origin git@github.com:RuairiSpain/Marlin2.git
-if grep -Fq "core_dir = PlatformIO" ${MARLIN_DIR}/platformio.ini
-then
-  sed -i "s@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
-fi
+sed -i "s@\[platformio\]\ncore_dir = @\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
+sed -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini # remove duplicate lines
+
 if grep -Fqv "default_envs = ${BOARD}" ${MARLIN_DIR}/platformio.ini
 then
   sed -i "s@default_envs.*=.*@default_envs = ${BOARD}@" ${MARLIN_DIR}/platformio.ini

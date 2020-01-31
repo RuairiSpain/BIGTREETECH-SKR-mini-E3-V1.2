@@ -32,7 +32,7 @@ cd ..
 
 git remote add origin git@github.com:RuairiSpain/Marlin2.git
 sed -i "s@\[platformio\]\ncore_dir = @\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
-sed --quiet -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini # remove duplicate lines
+sed --quiet -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini > /dev/null 2>&1
 
 if grep -Fqv "default_envs = ${BOARD}" ${MARLIN_DIR}/platformio.ini
 then

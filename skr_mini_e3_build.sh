@@ -9,13 +9,13 @@
 
 VENV_DIR=/c/Users/ruair/.platformio
 MARLIN_DIR=/c/exit/doc/BIGTREETECH-SKR-mini-E3-V1.2/Marlin
-BRANCH=upstream/bugfix-2.0.x
+BRANCH=upstream/dev-2.1.x #upstream/bugfix-2.0.x
 BOARD=STM32F103RC_bigtree_512K
 
 ${VENV_DIR}/penv/Scripts/python -m venv ${VENV_DIR}
 ${VENV_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
 
-
+git push -f tags
 git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 cd ${MARLIN_DIR}
 git add .
@@ -26,13 +26,13 @@ git checkout -b ${BRANCH}
 curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration.h" --output Configuration.h
 curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration_adv.h"  --output Configuration_adv.h
 git -C ${MARLIN_DIR} commit -a -m "base example config"
-git push -f tags
+
 git push -uq origin origin/${BRANCH}
 cd ..
 
 git remote add origin git@github.com:RuairiSpain/Marlin2.git
 sed -i "s@\[platformio\]\ncore_dir = @\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
-sed -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini # remove duplicate lines
+sed -n -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini # remove duplicate lines
 
 if grep -Fqv "default_envs = ${BOARD}" ${MARLIN_DIR}/platformio.ini
 then

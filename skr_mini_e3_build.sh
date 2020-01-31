@@ -250,15 +250,16 @@ sed -i "s@.*#define TMC_DEBUG@  #define TMC_DEBUG@" ${MARLIN_DIR}/Marlin/Configu
 grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 
 ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.bin
-cp Marlin/.pio/build/${BOARD}/firmware.bin .
+
+cp Marlin/.pio/build/${BOARD}/firmware.bin ./firmware${BRANCH##*/}.bin
 
 cd ${MARLIN_DIR}
 git add .
-git commit -m "New code for ${BOARD} with branch ${BRANCH}"
+git commit -m "New code for ${BOARD} with branch ${BRANCH##*/}"
 git push -uq origin origin/${BRANCH}
 git status
 cd ..
 git add .
-git commit -m "New build for ${BOARD} with branch ${BRANCH}"
+git commit -m "New build for ${BOARD} with branch ${BRANCH##*/}"
 git push
 git status

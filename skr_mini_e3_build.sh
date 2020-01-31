@@ -16,7 +16,6 @@ ${VENV_DIR}/penv/Scripts/python -m venv ${VENV_DIR}
 ${VENV_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
 
 
-
 git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 cd ${MARLIN_DIR}
 git add .
@@ -27,7 +26,8 @@ git checkout -b ${BRANCH}
 curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration.h" --output Configuration.h
 curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration_adv.h"  --output Configuration_adv.h
 git -C ${MARLIN_DIR} commit -a -m "base example config"
-git push -uqf origin origin/${BRANCH}
+git push -f tags
+git push -uq origin origin/${BRANCH}
 cd ..
 
 #git -C ${MARLIN_DIR} log -1
@@ -247,7 +247,7 @@ sed -i "s@.*#define TMC_DEBUG@  #define TMC_DEBUG@" ${MARLIN_DIR}/Marlin/Configu
 
 (cd ${MARLIN_DIR}; ${VENV_DIR}/penv/Scripts/platformio run)
 
-grep "STRING_DISTRIBUTION_DATE.*" ${MARLIN_DIR}/Marlin/src/inc/Version.h
+grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 
 ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.bin
 cp Marlin/.pio/build/${BOARD}/firmware.bin .
@@ -255,10 +255,10 @@ cp Marlin/.pio/build/${BOARD}/firmware.bin .
 cd ${MARLIN_DIR}
 git add .
 git commit -m "New code for ${BOARD} with branch ${BRANCH}"
-git push -uqf origin origin/${BRANCH}
+git push -uq origin origin/${BRANCH}
 git status
 cd ..
 git add .
 git commit -m "New build for ${BOARD} with branch ${BRANCH}"
-git push -uqf origin origin/${BRANCH}
+git push
 git status

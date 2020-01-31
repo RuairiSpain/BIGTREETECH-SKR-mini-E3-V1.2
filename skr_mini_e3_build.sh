@@ -1,54 +1,64 @@
 #!/bin/sh
 #
-# SKR mini E3 V1.2  -  Marlin 2.0  -  firmware build script
+# SKR mini E3 V1.2  -  Marlin 2.0  - automated build script
 #
 # Copyright (c) 2019-2020 Pascal de Bruijn
 # Amended by Ruairi O'Donnell
 
-MARLIN_DIR=./Marlin
-SHORT_BRANCH=2.0.3   #dev-2.1.x #bugfix-2.0.x
-BOARD=STM32F103RC_bigtree_512K
+# Step 1. PlatformIO location 
 PLATFORMIO_DIR=/c/Users/ruair/.platformio
+# Step 2. Marlin Git Branch
+SHORT_BRANCH=2.0.3   #dev-2.1.x #bugfix-2.0.x
 
-#https://github.com/MarlinFirmware/Configurations/tree/master/config/examples/Creality/Ender-3
-CONFIGURATION_FOLDER="BigTreeTech/SKR Mini E3 1.2"
+# Step 3. Simple configuration tweaks
+OFFSETS_XYZ="-60, -12, -2.55"
+ESTEPS_XYZE="80, 80, 400, 105.68"
 CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/
+CONFIGURATION_PATH="BigTreeTech/SKR Mini E3 1.2"
 
 
-CONFIGURATION_FOLDER=$(python -c $'try: import urllib.request as urllib\nexcept: import urllib\nimport sys\nsys.stdout.write(
-urllib.quote(input()))' <<< ${CONFIGURATION_FOLDER})
 
 
-#echo ${CONFIGURATION_FOLDER}
-#echo ${CONFIGURATION_PREFIX}
 
-BRANCH=upstream/${BRANCH}
+
+#START SCRIPT
+BOARD=STM32F103RC_bigtree_512K #base board
+BRANCH=upstream/${BRANCH} #temporary branch to store forked Marlin code
+#Check platformIO and install updates
 ${PLATFORMIO_DIR}/penv/Scripts/python -m venv ${PLATFORMIO_DIR}
 ${PLATFORMIO_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
+#URL encode configuration path space -> %20, etc.
+CONFIGURATION_PATH=$(python -c $'try: import urllib.request as urllib\nexcept: import urllib\nimport sys\nsys.stdout.write(
+urllib.quote(input()))' <<< ${CONFIGURATION_PATH})
+#Path for Marlin source code
+MARLIN_DIR=./Marlin
 
+# if marlin code is not downloaded then clone the Marlin git repo
 if [ ! -d  ${MARLIN_DIR} ]
 then
   git clone -q https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 fi
 
+#change from the current Marlin branch to the desired build branch
 cd ${MARLIN_DIR}
 git checkout ${SHORT_BRANCH}
 
-curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration.h" --output Configuration.h
-curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration_adv.h"  --output Configuration_adv.h
+# download template Configuration.h and Configuration_adv.h files for the example board
+curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration.h" --output Configuration.h
+curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration_adv.h"  --output Configuration_adv.h
 
 cd ..
 
-#git remote add origin git@github.com:RuairiSpain/Marlin2.git
+#Start by modifying the PlatformIO config
 sed -i "s@\[platformio\]\ncore_dir = @\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
 sed --quiet -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini > /dev/null 2>&1
-
+#Add our base board to the platformIO config
 if grep -Fqv "default_envs = ${BOARD}" ${MARLIN_DIR}/platformio.ini
 then
   sed -i "s@default_envs.*=.*@default_envs = ${BOARD}@" ${MARLIN_DIR}/platformio.ini
 fi
 
-
+#Modify Configuration.h and Configuration_adv.h files
 sed -i "s@#define SERIAL_PORT .*@#define SERIAL_PORT 2@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define SERIAL_PORT_2 .*@#define SERIAL_PORT_2 -1@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@#define BAUDRATE .*@#define BAUDRATE 115200@" ${MARLIN_DIR}/Marlin/Configuration.h
@@ -59,7 +69,7 @@ sed -i "s@/*#define Z_DRIVER_TYPE .*@#define Z_DRIVER_TYPE  TMC2209@" ${MARLIN_D
 sed -i "s@/*#define E0_DRIVER_TYPE .*@#define E0_DRIVER_TYPE TMC2209@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define CR10_STOCKDISPLAY@#define CR10_STOCKDISPLAY@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define SPEAKER@//#define SPEAKER@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 93 }.*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 105.68 }@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@.*#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 93 }.*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { ${ESTEPS_XYZE} }@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@#define DEFAULT_MAX_FEEDRATE.*@#define DEFAULT_MAX_FEEDRATE          { 500, 500, 20, 60 }@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
@@ -82,8 +92,8 @@ sed -i "s@.*#define ARC_SUPPORT@//#define ARC_SUPPORT@" ${MARLIN_DIR}/Marlin/Con
 
 
 # personal tweaks
-sed -i 's@#define STRING_CONFIG_H_AUTHOR .*@#define STRING_CONFIG_H_AUTHOR "Lapido SKR E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "Lapido"@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define STRING_CONFIG_H_AUTHOR .*@#define STRING_CONFIG_H_AUTHOR "SKR E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "ENDER SKR E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define SHOW_BOOTSCREEN@//#define SHOW_BOOTSCREEN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define SHOW_CUSTOM_BOOTSCREEN@//#define SHOW_CUSTOM_BOOTSCREEN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IMAGE@" ${MARLIN_DIR}/Marlin/Configuration.h
@@ -217,7 +227,7 @@ sed -i "s@/*#define BLTOUCH@#define BLTOUCH@" ${MARLIN_DIR}/Marlin/Configuration
 sed -i "s@/*#define LCD_BED_LEVELING@#define LCD_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define AUTO_BED_LEVELING_BILINEAR@#define AUTO_BED_LEVELING_BILINEAR@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 3@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { -60, -12, -2.55 }@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { ${OFFSETS_XYZ} }@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@#define XY_PROBE_SPEED .*@#define XY_PROBE_SPEED 6000@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 

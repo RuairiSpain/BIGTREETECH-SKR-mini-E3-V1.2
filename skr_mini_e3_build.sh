@@ -8,7 +8,7 @@
 # Step 1. PlatformIO location 
 PLATFORMIO_DIR=/c/Users/ruair/.platformio
 # Step 2. Marlin Git Branch
-SHORT_BRANCH=2.0.3   #dev-2.1.x #bugfix-2.0.x
+SHORT_BRANCH=bugfix-2.0.x  #2.0.3 #dev-2.1.x #bugfix-2.0.x
 
 # Step 3. Simple configuration tweaks
 OFFSETS_XYZ="-60, -12, -2.55"
@@ -16,10 +16,10 @@ ESTEPS_XYZE="80, 80, 400, 105.68"
 CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/
 CONFIGURATION_PATH="BigTreeTech/SKR Mini E3 1.2"
 
-
-
-
-
+# Step 4. Hotend PID calibration values
+Kp="23.24"
+Ki="2.03"
+Kd="66.60"
 
 #START SCRIPT
 BOARD=STM32F103RC_bigtree_512K #base board
@@ -112,8 +112,8 @@ sed -i "s@/*#define CANCEL_OBJECTS@#define CANCEL_OBJECTS@g" ${MARLIN_DIR}/Marli
 sed -i "s@/.*#define Z_MIN_PROBE_REPEATABILITY_TEST@  #define Z_MIN_PROBE_REPEATABILITY_TEST@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/.*#define RESTORE_LEVELING_AFTER_G28@  #define RESTORE_LEVELING_AFTER_G28@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define GRID_MAX_POINTS_X 3@  #define GRID_MAX_POINTS_X 5@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE - 60) / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE - 20) / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@.*#define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE - 100) / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@.*#define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE - 100) / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/.*#define NOZZLE_CLEAN_FEATURE@  #define NOZZLE_CLEAN_FEATURE@g" ${MARLIN_DIR}/Marlin/Configuration.h
 
 sed -i "s@.*#define ENDSTOPS_ALWAYS_ON_DEFAULT@#define ENDSTOPS_ALWAYS_ON_DEFAULT@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -184,12 +184,9 @@ sed -i "s@.*#define FILAMENT_RUNOUT_SENSOR@#define FILAMENT_RUNOUT_SENSOR@g" ${M
 sed -i "s@.*runout.enabled = true@    runout.enabled = false@g" ${MARLIN_DIR}/Marlin/src/module/configuration_store.cpp
 
 
-
-# hot-end pid retuning
-sed -i "s@#define DEFAULT_Kp 21.73@#define DEFAULT_Kp 23.24@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@#define DEFAULT_Ki 1.54@#define DEFAULT_Ki 2.03@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@#define DEFAULT_Kd 76.55@#define DEFAULT_Kd 66.60@" ${MARLIN_DIR}/Marlin/Configuration.h
-
+sed -i "s@#define DEFAULT_Kp 21.73@#define DEFAULT_Kp ${Kp}@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_Ki 1.54@#define DEFAULT_Ki {${Ki}@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_Kd 76.55@#define DEFAULT_Kd ${Kd}@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 # make sure bed pid temp remains disabled, to keep compatibility with flex-steel pei
@@ -226,7 +223,7 @@ sed -i "s@.*#define MESH_EDIT_MENU@  //#define MESH_EDIT_MENU@" ${MARLIN_DIR}/Ma
 sed -i "s@/*#define BLTOUCH@#define BLTOUCH@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define LCD_BED_LEVELING@#define LCD_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define AUTO_BED_LEVELING_BILINEAR@#define AUTO_BED_LEVELING_BILINEAR@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 3@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@.*#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 5@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { ${OFFSETS_XYZ} }@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@#define XY_PROBE_SPEED .*@#define XY_PROBE_SPEED 6000@" ${MARLIN_DIR}/Marlin/Configuration.h
 

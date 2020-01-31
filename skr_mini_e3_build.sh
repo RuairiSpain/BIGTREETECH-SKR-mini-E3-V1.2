@@ -12,26 +12,27 @@ MARLIN_DIR=/c/exit/doc/BIGTREETECH-SKR-mini-E3-V1.2/Marlin
 BRANCH=upstream/dev-2.1.x #upstream/bugfix-2.0.x
 BOARD=STM32F103RC_bigtree_512K
 
+
+SHORT_BRANCH=${BRANCH##*/}
 ${VENV_DIR}/penv/Scripts/python -m venv ${VENV_DIR}
 ${VENV_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
 
-git push -f tags
 git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 cd ${MARLIN_DIR}
-git add .
-git commit -m "Updates"
-#git push -uqf origin origin/${BRANCH}
-git status
-git checkout -b ${BRANCH}
+
+git stash
+git checkout -B ${BRANCH}
+#git branch -v
+
 curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration.h" --output Configuration.h
 curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration_adv.h"  --output Configuration_adv.h
 git -C ${MARLIN_DIR} commit -a -m "base example config"
 
-git remote remove origin/${BRANCH}
-git push -uq origin origin/${BRANCH}
+#git remote remove origin/${BRANCH}
+#git push -uq origin origin/${BRANCH}
 cd ..
 
-git remote add origin git@github.com:RuairiSpain/Marlin2.git
+#git remote add origin git@github.com:RuairiSpain/Marlin2.git
 sed -i "s@\[platformio\]\ncore_dir = @\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
 sed --quiet -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini > /dev/null 2>&1
 
@@ -249,16 +250,17 @@ grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 
 ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.bin
 
-cp Marlin/.pio/build/${BOARD}/firmware.bin ./firmware-${BRANCH##*/}.bin
+cp Marlin/.pio/build/${BOARD}/firmware.bin ./firmware-${SHORT_BRANCH}.bin
 
 cd ${MARLIN_DIR}
+git checkout -B origin/${SHORT_BRANCH}
 git add .
-git commit -m "New code for ${BOARD} with branch ${BRANCH##*/}"
-git remote remove origin/${BRANCH}
-git push -uq origin origin/${BRANCH}
+git commit -m "New code for ${BOARD} with branch ${SHORT_BRANCH}"
+git push -uq origin origin/${SHORT_BRANCH}
 git status
 cd ..
+git checkout -B origin/${SHORT_BRANCH}
 git add .
-git commit -m "New build for ${BOARD} with branch ${BRANCH##*/}"
+git commit -m "New build for ${SHORT_BOARD} with branch ${SHORT_BRANCH}"
 git push
 git status

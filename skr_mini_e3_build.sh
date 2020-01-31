@@ -11,25 +11,26 @@ VENV_DIR=/c/Users/ruair/.platformio
 MARLIN_DIR=/c/exit/doc/BIGTREETECH-SKR-mini-E3-V1.2/Marlin
 BRANCH=upstream/dev-2.1.x #upstream/bugfix-2.0.x
 BOARD=STM32F103RC_bigtree_512K
+#https://github.com/MarlinFirmware/Configurations/tree/master/config/examples/Creality/Ender-3
+CONFIGURATION_FOLDER=BigTreeTech/SKR%20Mini%20E3%201.2
+CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/
 
 
 SHORT_BRANCH=${BRANCH##*/}
 ${VENV_DIR}/penv/Scripts/python -m venv ${VENV_DIR}
 ${VENV_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
 
-git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
+if [ ! -d  ${MARLIN_DIR} ]
+then
+  git clone -q https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
+fi
+
 cd ${MARLIN_DIR}
+git checkout ${SHORT_BRANCH}
 
-git stash
-git checkout -B ${BRANCH}
-#git branch -v
+curl '${CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration.h' --output Configuration.h
+curl '{CONFIGURATION_PREFIX}${CONFIGURATION_PREFIX}/Configuration_adv.h'  --output Configuration_adv.h
 
-curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration.h" --output Configuration.h
-curl "https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/BigTreeTech/SKR%20Mini%20E3%201.2/Configuration_adv.h"  --output Configuration_adv.h
-git -C ${MARLIN_DIR} commit -a -m "base example config"
-
-#git remote remove origin/${BRANCH}
-#git push -uq origin origin/${BRANCH}
 cd ..
 
 #git remote add origin git@github.com:RuairiSpain/Marlin2.git
@@ -242,7 +243,7 @@ sed -i "s@/*#define DEBUG_LEVELING_FEATURE@#define DEBUG_LEVELING_FEATURE@g" ${M
 sed -i "s@.*#define TMC_DEBUG@  #define TMC_DEBUG@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
-rm Marlin/.pio/build/${BOARD}/firmware.bin
+#rm -rf Marlin/.pio/build/${BOARD}
 
 (cd ${MARLIN_DIR}; ${VENV_DIR}/penv/Scripts/platformio run)
 

@@ -34,7 +34,7 @@ cd ..
 
 
 git remote add origin git@github.com:RuairiSpain/Marlin2.git
-if grep -Fqv "core_dir = PlatformIO" ${MARLIN_DIR}/platformio.ini
+if grep -Fq "core_dir = PlatformIO" ${MARLIN_DIR}/platformio.ini
 then
   sed -i "s@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
 fi

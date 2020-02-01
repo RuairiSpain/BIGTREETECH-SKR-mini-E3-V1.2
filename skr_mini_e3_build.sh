@@ -1,38 +1,33 @@
 #!/bin/sh
-#
 # SKR mini E3 V1.2  -  Marlin 2.0  - automated build script
-#
 # Copyright (c) 2019-2020 Pascal de Bruijn
-# Amended by Ruairi O'Donnell
+# Modified by RuairiSpain
 
-# Step 1. PlatformIO location
-PLATFORMIO_DIR=/c/Users/ruair/.platformio
-
+# Step 1. Configure PlatformIO location, if platdformIO not installed then download and install it
+PLATFORMIO_DIR=~/.platformio
+if [ -d "$PLATFORMIO_DIR" ]; then
+  python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)"
+fi
+${PLATFORMIO_DIR}/penv/Scripts/platformio --version
 # Step 2. Marlin Git Branch, example in comments
 SHORT_BRANCH=2.0.3  #2.0.3 #dev-2.1.x #bugfix-2.0.x
-
 # Step 3. Simple configuration tweaks
 #Tweak e-steps for steppers X, Y, Z and E
 ESTEPS_XYZE="80, 80, 400, 105.68"
 #URL to download base configuration to change, script uses Marlin files for BTT SKR Mini E3 1.2 as a starting point
 CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/
 CONFIGURATION_PATH="BigTreeTech/SKR Mini E3 1.2"
-
 # Step 4 (optional). Hotend PID calibration values, comment out 3 lines if you want the defaults
 Kp="23.24"
 Ki="2.03"
 Kd="66.60"
-
 # Step 5. BLtouch enable (ture) disable (false)
 BLTOUCH=true
 # Offset for BLTouch relative to nozzle X, Y, Z.  Negative values left, forward and down
 OFFSETS_XYZ="-60, -12, -2.55"
-
 # Step 6.  BLTouch in using non-standard pin, ie PROBE pin is PC14
 # comment out line if using BLTouch in using Z-stop (PC2 pin)
 PROBE_PIN="PC14"
-
-
 # MAIN SCRIPT --- ONLY EDIT BELOW HERE IF YOU KNOW WHAT YOU ARE DOING ---
 BOARD=STM32F103RC_bigtree_512K #base board
 BRANCH=upstream/${BRANCH} #temporary branch to store forked Marlin code
@@ -48,12 +43,21 @@ MARLIN_DIR=./Marlin
 # if marlin code is not downloaded then clone the Marlin git repo
 if [ ! -d  ${MARLIN_DIR} ]
 then
+  #clone the Marlin repo and checkout the branch
   git clone -q https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
+  cd ${MARLIN_DIR}
+  git checkout ${SHORT_BRANCH}
+else
+  #change from the current Marlin branch to the desired build branch
+  cd ${MARLIN_DIR}
+  git stash
+  git fetch --all
+  git reset --hard HEAD
+  git checkout ${SHORT_BRANCH}
 fi
 
-#change from the current Marlin branch to the desired build branch
-cd ${MARLIN_DIR}
-git checkout ${SHORT_BRANCH}
+
+
 
 # download template Configuration.h and Configuration_adv.h files for the example board
 cd Marlin

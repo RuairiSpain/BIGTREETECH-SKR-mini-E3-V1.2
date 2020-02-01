@@ -285,11 +285,11 @@ cp Marlin/.pio/build/${BOARD}/firmware.bin ./firmware-${SHORT_BRANCH}.bin
 #git checkout -t backup/${SHORT_BRANCH}
 #git add .
 #git commit -m "New code for ${BOARD} with branch ${SHORT_BRANCH}"
-#git push --set-upstream backup ${SHORT_BRANCH}
+git push --set-upstream backup ${SHORT_BRANCH}
 #git status
 #cd ..
-git checkout -t origin/${SHORT_BRANCH}
-git add .
-git commit -m "New build for ${SHORT_BOARD} with branch ${SHORT_BRANCH}"
+#git checkout -t origin/${SHORT_BRANCH}
+#git add .
+#git commit -m "New build for ${SHORT_BOARD} with branch ${SHORT_BRANCH}"
 #git push
-git status
+#git status

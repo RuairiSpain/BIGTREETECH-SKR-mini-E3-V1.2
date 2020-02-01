@@ -6,7 +6,7 @@
 # Step 1. Configure PlatformIO location, if platdformIO not installed then download and install it
 PLATFORMIO_DIR=~/.platformio
 if [ -d "$PLATFORMIO_DIR" ]; then
-  python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)"
+  python -c "$(curl -fsSL --cacert ./cacert.pem https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)"
 fi
 ${PLATFORMIO_DIR}/penv/Scripts/platformio --version
 
@@ -68,8 +68,8 @@ fi
 
 # download template Configuration.h and Configuration_adv.h files for the example board
 cd Marlin
-curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration.h" --output Configuration.h
-curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration_adv.h"  --output Configuration_adv.h
+curl --cacert ../../cacert.pem "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration.h" --output Configuration.h
+curl --cacert ../../cacert.pem "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration_adv.h"  --output Configuration_adv.h
 
 cd ../..
 
@@ -291,5 +291,5 @@ cp Marlin/.pio/build/${BOARD}/firmware.bin ./firmware-${SHORT_BRANCH}.bin
 git checkout -t origin/${SHORT_BRANCH}
 git add .
 git commit -m "New build for ${SHORT_BOARD} with branch ${SHORT_BRANCH}"
-git push
+#git push
 git status

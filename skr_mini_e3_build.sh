@@ -56,14 +56,15 @@ cd ${MARLIN_DIR}
 git checkout ${SHORT_BRANCH}
 
 # download template Configuration.h and Configuration_adv.h files for the example board
+cd Marlin
 curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration.h" --output Configuration.h
 curl "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration_adv.h"  --output Configuration_adv.h
 
-cd ..
+cd ../..
 
 #Start by modifying the PlatformIO config
-sed -i "s@\[platformio\]\ncore_dir = @\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
-#sed --quiet -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini > /dev/null 2>&1
+sed -i "s@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
+sed --quiet -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini > /dev/null 2>&1
 #Add our base board to the platformIO config
 if grep -Fqv "default_envs = ${BOARD}" ${MARLIN_DIR}/platformio.ini
 then

@@ -196,7 +196,7 @@ if [ -n "$Kp" ]; then
 sed -i "s@#define DEFAULT_Kp 21.73@#define DEFAULT_Kp ${Kp}@" ${MARLIN_DIR}/Marlin/Configuration.h
 fi
 if [ -n "$Ki" ]; then
-sed -i "s@#define DEFAULT_Ki 1.54@#define DEFAULT_Ki {${Ki}@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_Ki 1.54@#define DEFAULT_Ki ${Ki}@" ${MARLIN_DIR}/Marlin/Configuration.h
 fi
 if [ -n "$Kd" ]; then
 sed -i "s@#define DEFAULT_Kd 76.55@#define DEFAULT_Kd ${Kd}@" ${MARLIN_DIR}/Marlin/Configuration.h

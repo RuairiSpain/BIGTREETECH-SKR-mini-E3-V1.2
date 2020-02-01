@@ -4,9 +4,9 @@ Marlin binaries with BLTouch most settings are customizable from the LCD display
 X, Y, Z Offsets; steps/mm; bed leveling; Probe Z offset; `M48` probe accuracy; Level corners (paper test); Preheat PLA/PTEG; Velocity; Acceleration; Jerk; TMC driver settings; BLTouch settings menu; K value; Runout sensor. These are enabled: Nozzle Park, Junction deviation, Linear Advance, Trinamic hybrid threshold, SCurve not enabled. You can print from SD card or via Cura/OctoPi/PronterFace.
 
 You can enable/disable the BLTOuch by setting the variable `BLTOUCH=true or BLTOUCH=false`. I use a clone BLTouch called 3DTouch, it has a non-standard wire colours so I've added a diagram for anyone that needs it with my wiring colors. I connect my BLTouch to SKR board using `PROBE` and `SERVO` pins. You can set the PIN in the script, with `$PROBE_PIN`, or comment it out and it will be configured for the z-stop. ![Connect #DTouch to Servo and Probe pins](Wiring_3dtouch_skr_mini_e3_1_2_board.png)  
-My BLTouch `XYZ` offsets are setup for the Hydra Fan system https://www.thingiverse.com/thing:4062242, but you can change it in the LCD menus
+You can customize the BLTouch offset by editing `OFFSETS_XYZ="-45, -5, -2"`. My BLTouch `XYZ` offsets are setup for the Hydra Fan system https://www.thingiverse.com/thing:4062242. You can change the offsets in the LCD menus when the firmware is flashed to the printer.
 
-Before doing a big print, you should clibrate your step/mm and Hotend PID and change them in the menus.
+Before doing a big print, you should calibrate your step/mm and hot-end PID and change them in the menus. There are variable in the script to customize the PID, example: `Kp="23.24", Ki="2.03", Kd="66.60"`
 
 This script is fork of [Pascal's project](https://github.com/pmjdebruijn/BIGTREETECH-SKR-mini-E3-V1.2)
 

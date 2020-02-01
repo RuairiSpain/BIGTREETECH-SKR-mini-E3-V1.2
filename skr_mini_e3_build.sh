@@ -270,7 +270,7 @@ cd ${MARLIN_DIR}
 git checkout -t backup/${SHORT_BRANCH}
 git add .
 git commit -m "New code for ${BOARD} with branch ${SHORT_BRANCH}"
-git push
+git push --set-upstream backup ${SHORT_BRANCH}
 git status
 cd ..
 git checkout -t origin/${SHORT_BRANCH}

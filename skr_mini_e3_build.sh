@@ -6,7 +6,7 @@
 # Step 1. Configure PlatformIO location, if platdformIO not installed then download and install it
 PLATFORMIO_DIR=~/.platformio
 if [ -d "$PLATFORMIO_DIR" ]; then
-  python -c "$(curl -fsSL --cacert ./cacert.pem https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)"
+  python -c "$(curl -kfsSL https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)"
 fi
 ${PLATFORMIO_DIR}/penv/Scripts/platformio --version
 
@@ -19,24 +19,34 @@ ESTEPS_XYZE="80, 80, 400, 105.68"
 
 #URL to download base configuration to change, script uses Marlin files for BTT SKR Mini E3 1.2 as a starting point
 CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/
-CONFIGURATION_PATH="BigTreeTech/SKR Mini E3 1.2"
+CONFIGURATION_PATH="BigTreeTech/SKR Mini E3 1.2" 
 
-# Step 4 (optional). Hotend PID calibration values, comment out 3 lines if you want the defaults
+# Step 4 printer size and (optional) Hotend PID  values, comment PID out 3 lines if you want the defaults
+X_BED_SIZE=220
+Y_BED_SIZE=220
+Z_MAX_POS=235
+
 Kp="23.24"
 Ki="2.03"
 Kd="66.60"
 
+Print max X Y Z to set bed size and max Z print volume
+
 # Step 5. BLtouch enable (ture) disable (false)
-BLTOUCH=true
+PROBE="BLTOUCH" #Options:"PROBE_MANUALLY" 'FIX_MOUNTED_PROBE' 'NOZZLE_AS_PROBE' 'Z_PROBE_SERVO_NR' 'TOUCH_MI_PROBE' 'Z_PROBE_SLED' 'RACK_AND_PINION_PROBE'
+#Choose the type of bed leveling system you require
+BED_LEVELING="AUTO_BED_LEVELING_BILINEAR" #Options: "AUTO_BED_LEVELING_3POINT" "AUTO_BED_LEVELING_LINEAR" "AUTO_BED_LEVELING_BILINEAR" "AUTO_BED_LEVELING_UBL" "MESH_BED_LEVELING"
 # Offset for BLTouch relative to nozzle X, Y, Z.  Negative values left, forward and down
 OFFSETS_XYZ="-60, -12, -2.55"
 
 # Step 6.  BLTouch in using non-standard pin, ie PROBE pin is PC14
 # comment out line if using BLTouch in using Z-stop (PC2 pin)
+#Only use one of these two settings, comment out the one you don't use
 PROBE_PIN="PC14"
+#Z_MIN_PROBE_PIN="32"
 
 # MAIN SCRIPT --- ONLY EDIT BELOW HERE IF YOU KNOW WHAT YOU ARE DOING ---
-BOARD=STM32F103RC_bigtree_512K #base board
+BOARD="STM32F103RC_bigtree_512K" #base board
 BRANCH=upstream/${BRANCH} #temporary branch to store forked Marlin code
 #Check platformIO and install updates
 ${PLATFORMIO_DIR}/penv/Scripts/python -m venv ${PLATFORMIO_DIR}
@@ -68,8 +78,8 @@ fi
 
 # download template Configuration.h and Configuration_adv.h files for the example board
 cd Marlin
-curl --cacert ../../cacert.pem "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration.h" --output Configuration.h
-curl --cacert ../../cacert.pem "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration_adv.h"  --output Configuration_adv.h
+curl -k "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration.h" --output Configuration.h
+curl -k "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration_adv.h"  --output Configuration_adv.h
 
 cd ../..
 
@@ -81,6 +91,25 @@ if grep -Fqv "default_envs = ${BOARD}" ${MARLIN_DIR}/platformio.ini
 then
   sed -i "s@default_envs.*=.*@default_envs = ${BOARD}@" ${MARLIN_DIR}/platformio.ini
 fi
+
+
+#Change bed size/ and max print volume
+sed -i "s@#define X_BED_SIZE .*@#define X_BED_SIZE 220@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define Y_BED_SIZE .*@#define Y_BED_SIZE 220@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define Z_MAX_POS .*@#define Z_MAX_POS 300@" ${MARLIN_DIR}/Marlin/Configuration.h
+
+
+#Update hotend PID calibrated defaults
+if [ -n "$Kp" ]; then
+sed -i "s@#define DEFAULT_Kp 21.73@#define DEFAULT_Kp ${Kp}@" ${MARLIN_DIR}/Marlin/Configuration.h
+fi
+if [ -n "$Ki" ]; then
+sed -i "s@#define DEFAULT_Ki 1.54@#define DEFAULT_Ki ${Ki}@" ${MARLIN_DIR}/Marlin/Configuration.h
+fi
+if [ -n "$Kd" ]; then
+sed -i "s@#define DEFAULT_Kd 76.55@#define DEFAULT_Kd ${Kd}@" ${MARLIN_DIR}/Marlin/Configuration.h
+fi
+
 
 #Modify Configuration.h and Configuration_adv.h files
 sed -i "s@#define SERIAL_PORT .*@#define SERIAL_PORT 2@" ${MARLIN_DIR}/Marlin/Configuration.h
@@ -94,7 +123,6 @@ sed -i "s@/*#define E0_DRIVER_TYPE .*@#define E0_DRIVER_TYPE TMC2209@" ${MARLIN_
 sed -i "s@.*#define CR10_STOCKDISPLAY@#define CR10_STOCKDISPLAY@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define SPEAKER@//#define SPEAKER@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 93 }.*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { ${ESTEPS_XYZE} }@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@#define DEFAULT_MAX_FEEDRATE.*@#define DEFAULT_MAX_FEEDRATE          { 500, 500, 20, 60 }@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 # discovered from BigTreeTech reference firmware sources
@@ -103,11 +131,14 @@ sed -i "s@/*#define ENDSTOP_INTERRUPTS_FEATURE@#define ENDSTOP_INTERRUPTS_FEATUR
 sed -i "s@#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@//#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define FAN_SOFT_PWM@#define FAN_SOFT_PWM@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define SOFT_ENDSTOPS_MENU_ITEM@#define SOFT_ENDSTOPS_MENU_ITEM@" ${MARLIN_DIR}/Marlin/Configuration.h
-
+sed -i "s@/*#define DISABLE_M503 @#define DISABLE_M503@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 # beware https://github.com/MarlinFirmware/Marlin/pull/16143
 sed -i "s@.*#define SD_CHECK_AND_RETRY@#define SD_CHECK_AND_RETRY@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
+# reduce Hotend fan PWM frequency
+sed -i "s@#define SOFT_PWM_SCALE .*@#define SOFT_PWM_SCALE 2@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*#define SOFT_PWM_DITHER@#define SOFT_PWM_DITHER@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 # save some space, since slicers don"t use it
@@ -121,29 +152,30 @@ sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "ENDER SKR 
 sed -i "s@.*#define SHOW_BOOTSCREEN@//#define SHOW_BOOTSCREEN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define SHOW_CUSTOM_BOOTSCREEN@//#define SHOW_CUSTOM_BOOTSCREEN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IMAGE@" ${MARLIN_DIR}/Marlin/Configuration.h
-#sed -i "s@/.*#define CLASSIC_JERK@#define CLASSIC_JERK@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define LEVEL_BED_CORNERS@#define LEVEL_BED_CORNERS@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define LEVEL_CORNERS_INSET .*@  #define LEVEL_CORNERS_INSET 33@g" ${MARLIN_DIR}/Marlin/Configuration.h
 
-sed -i "s@.*#define JUNCTION_DEVIATION_MM .*@  #define JUNCTION_DEVIATION_MM 0.04@g" ${MARLIN_DIR}/Marlin/Configuration.h
 
-#sed -i "s@.*#define S_CURVE_ACCELERATION@//#define S_CURVE_ACCELERATION@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define LIN_ADVANCE@#define LIN_ADVANCE@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i "s@.*#define LIN_ADVANCE_K .*@  #define LIN_ADVANCE_K 0.50@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+#MARLIN 2.0 Spped features!
+#TURN OFF ALL 3 S Curve, Linear adv and Junction Dev, testing extruder skipping
+sed -i "s@#define S_CURVE_ACCELERATION@//#define S_CURVE_ACCELERATION@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define LIN_ADVANCE@//#define LIN_ADVANCE@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i "s@#define LIN_ADVANCE_K .*@  #define LIN_ADVANCE_K 0.05@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i "s@#define JUNCTION_DEVIATION_MM .*@  #//define JUNCTION_DEVIATION_MM 0.01@g" ${MARLIN_DIR}/Marlin/Configuration.h
+#Old Jerk settings
+sed -i "s@/.*#define CLASSIC_JERK@#define CLASSIC_JERK@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/.*#define LIMITED_JERK_EDITING @#define LIMITED_JERK_EDITING@g" ${MARLIN_DIR}/Marlin/Configuration.h
+
 sed -i "s@/*#define MONITOR_DRIVER_STATUS@#define MONITOR_DRIVER_STATUS@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i "s@/*#define CANCEL_OBJECTS@#define CANCEL_OBJECTS@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
 sed -i "s@/.*#define Z_MIN_PROBE_REPEATABILITY_TEST@  #define Z_MIN_PROBE_REPEATABILITY_TEST@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/.*#define RESTORE_LEVELING_AFTER_G28@  #define RESTORE_LEVELING_AFTER_G28@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define GRID_MAX_POINTS_X 3@  #define GRID_MAX_POINTS_X 5@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE - 100) / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE - 100) / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@.*#define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_X_POINT (X_BED_SIZE / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@.*#define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_Y_POINT (Y_BED_SIZE / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/.*#define Z_HOMING_HEIGHT .*@#define Z_HOMING_HEIGHT 10@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/.*#define NOZZLE_CLEAN_FEATURE@  #define NOZZLE_CLEAN_FEATURE@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define ENDSTOPS_ALWAYS_ON_DEFAULT@#define ENDSTOPS_ALWAYS_ON_DEFAULT@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i "s@.*#define INDIVIDUAL_AXIS_HOMING_MENU@#define INDIVIDUAL_AXIS_HOMING_MENU@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define SQUARE_WAVE_STEPPING@  //#define SQUARE_WAVE_STEPPING@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i "s@/.*#define PRINT_PROGRESS_SHOW_DECIMALS@#define PRINT_PROGRESS_SHOW_DECIMALS@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
+sed -i "s@/*#define CANCEL_OBJECTS@#define CANCEL_OBJECTS@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 # tmc stepper driver hybrid stealthchop/spreadcycle
 sed -i "s@.*#define HYBRID_THRESHOLD@  #define HYBRID_THRESHOLD@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -203,17 +235,6 @@ sed -i "s@.*#define FILAMENT_RUNOUT_SENSOR@#define FILAMENT_RUNOUT_SENSOR@g" ${M
 sed -i "s@.*runout.enabled = true@    runout.enabled = false@g" ${MARLIN_DIR}/Marlin/src/module/configuration_store.cpp
 
 
-if [ -n "$Kp" ]; then
-sed -i "s@#define DEFAULT_Kp 21.73@#define DEFAULT_Kp ${Kp}@" ${MARLIN_DIR}/Marlin/Configuration.h
-fi
-if [ -n "$Ki" ]; then
-sed -i "s@#define DEFAULT_Ki 1.54@#define DEFAULT_Ki ${Ki}@" ${MARLIN_DIR}/Marlin/Configuration.h
-fi
-if [ -n "$Kd" ]; then
-sed -i "s@#define DEFAULT_Kd 76.55@#define DEFAULT_Kd ${Kd}@" ${MARLIN_DIR}/Marlin/Configuration.h
-fi
-
-
 # make sure bed pid temp remains disabled, to keep compatibility with flex-steel pei
 sed -i "s@.*#define PIDTEMPBED@#define PIDTEMPBED@" ${MARLIN_DIR}/Marlin/Configuration.h
 
@@ -233,27 +254,90 @@ sed -i "s@#define PREHEAT_2_TEMP_HOTEND .*@#define PREHEAT_2_TEMP_HOTEND 240@g" 
 sed -i "s@#define PREHEAT_2_TEMP_BED .*@#define PREHEAT_2_TEMP_BED     70@g" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
-# bltouch probe on probe connector
-if [ -n "$BLTOUCH" ]; then
-sed -i "s@.*#define MESH_BED_LEVELING@//#define MESH_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define MESH_EDIT_MENU@  //#define MESH_EDIT_MENU@" ${MARLIN_DIR}/Marlin/Configuration.h
+
+
+case "$PROBE" in
+'BLTOUCH')
 sed -i "s@/*#define BLTOUCH@#define BLTOUCH@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/*#define LCD_BED_LEVELING@#define LCD_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/*#define AUTO_BED_LEVELING_BILINEAR@#define AUTO_BED_LEVELING_BILINEAR@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 5@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { ${OFFSETS_XYZ} }@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@#define XY_PROBE_SPEED .*@#define XY_PROBE_SPEED 6000@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/*#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 60@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/*#define EXTRAPOLATE_BEYOND_GRID@#define EXTRAPOLATE_BEYOND_GRID@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define BABYSTEP_MULTIPLICATOR_Z .*@  #define BABYSTEP_MULTIPLICATOR_Z 8@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i "s@.*#define BABYSTEP_MULTIPLICATOR_XY .*@  #define BABYSTEP_MULTIPLICATOR_XY 5@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i "s@/*#define BLTOUCH_DELAY 500@#define BLTOUCH_DELAY 500@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i "s@/*#define BABYSTEP_DISPLAY_TOTAL@#define BABYSTEP_DISPLAY_TOTAL@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i "s@/*#define BABYSTEP_ZPROBE_OFFSET@#define BABYSTEP_ZPROBE_OFFSET@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i "s@/*#define BABYSTEP_ZPROBE_GFX_OVERLAY@#define BABYSTEP_ZPROBE_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+;;
+'PROBE_MANUALLY')
+sed -i "s@/*#define PROBE_MANUALLY@#define PROBE_MANUALLY@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*#define MANUAL_PROBE_START_Z *.@#define define MANUAL_PROBE_START_Z 0.2@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+'FIX_MOUNTED_PROBE')
+sed -i "s@/*#define FIX_MOUNTED_PROBE@#define FIX_MOUNTED_PROBE@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+'NOZZLE_AS_PROBE')
+sed -i "s@/*#define NOZZLE_AS_PROBE@#define NOZZLE_AS_PROBE@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+'Z_PROBE_SERVO_NR')
+sed -i "s@/*#define Z_PROBE_SERVO_NR .*@#define Z_PROBE_SERVO_NR 0@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*##define Z_SERVO_ANGLES .*@##define Z_SERVO_ANGLES { 70, 0 } @" ${MARLIN_DIR}/Marlin/Config
+;;
+'TOUCH_MI_PROBE')
+sed -i "s@/*#define TOUCH_MI_PROBE@#define TOUCH_MI_PROBE@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+'Z_PROBE_SLED')
+sed -i "s@/*#define Z_PROBE_SLED@#define Z_PROBE_SLED@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*/#define SLED_DOCKING_OFFSET .*@/#define SLED_DOCKING_OFFSET 5@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+'RACK_AND_PINION_PROBE')
+sed -i "s@/*#define RACK_AND_PINION_PROBE@#define RACK_AND_PINION_PROBE@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+esac
+
+case "$BED_LEVELING" in
+'AUTO_BED_LEVELING_3POINT')
+sed -i "s@/*#define AUTO_BED_LEVELING_3POINT@#define AUTO_BED_LEVELING_3POINT@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define MESH_BED_LEVELING@//#define MESH_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
+/usr/bin/startpc
+;;
+'AUTO_BED_LEVELING_LINEAR')
+sed -i "s@/*#define AUTO_BED_LEVELING_LINEAR@#define AUTO_BED_LEVELING_LINEAR@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define MESH_BED_LEVELING@//#define MESH_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+'AUTO_BED_LEVELING_BILINEAR')
+sed -i "s@/*#define AUTO_BED_LEVELING_BILINEAR@#define AUTO_BED_LEVELING_BILINEAR@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define MESH_BED_LEVELING@//#define MESH_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+'AUTO_BED_LEVELING_UBL')
+sed -i "s@/*#define AUTO_BED_LEVELING_UBL@#define AUTO_BED_LEVELING_UBL@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define MESH_BED_LEVELING@//#define MESH_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+'MESH_BED_LEVELING')
+sed -i "s@/*#define MESH_BED_LEVELING@#define MESH_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
+;;
+esac
+sed -i "s@#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 20@" ${MARLIN_DIR}/Marlin/Configuration.h
+
+
+# Bed leveling settings
+sed -i "s@/*#define LCD_BED_LEVELING@#define LCD_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*#define MESH_EDIT_MENU@#define MESH_EDIT_MENU@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*#define LEVEL_CENTER_TOO@#define LEVEL_CENTER_TOO\n#define LEVEL_CORNERS_INSET 30@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define LEVEL_BED_CORNERS@#define LEVEL_BED_CORNERS@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define LEVEL_CORNERS_INSET .*@  #define LEVEL_CORNERS_INSET 20@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define LEVEL_CORNERS_INSET_LFRB { 30, 30, 30, 30 }@  #define LEVEL_CORNERS_INSET_LFRB { 20, 20, 20, 20 } @g" ${MARLIN_DIR}/Marlin/Configuration.h
+
+
+
+if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed leveling
+  sed -i "s@#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 3@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define ABL_BILINEAR_SUBDIVISION@#define ABL_BILINEAR_SUBDIVISION@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { ${OFFSETS_XYZ} }@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@#define XY_PROBE_SPEED .*@#define XY_PROBE_SPEED 3000@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 5@g" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define EXTRAPOLATE_BEYOND_GRID@#define EXTRAPOLATE_BEYOND_GRID@g" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@#define BABYSTEP_MULTIPLICATOR_Z .*@  #define BABYSTEP_MULTIPLICATOR_Z 8@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i "s@#define BABYSTEP_MULTIPLICATOR_XY .*@  #define BABYSTEP_MULTIPLICATOR_XY 5@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i "s@/*#define BABYSTEP_DISPLAY_TOTAL@#define BABYSTEP_DISPLAY_TOTAL@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i "s@/*#define BABYSTEP_ZPROBE_OFFSET@#define BABYSTEP_ZPROBE_OFFSET@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i "s@/*#define BABYSTEP_ZPROBE_GFX_OVERLAY@#define BABYSTEP_ZPROBE_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+fi
 
 # bltouch probe as z-endstop on z-endstop connector
-sed -i "s@#define Z_MAX_POS .*@#define Z_MAX_POS 235@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define Z_MAX_POS .*@#define Z_MAX_POS ${Z_MAX_POS}@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define Z_SAFE_HOMING@#define Z_SAFE_HOMING@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 # use probe connector as z-endstop connector
@@ -261,8 +345,21 @@ if [ -n "$PROBE_PIN" ]; then
     sed -i "s@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN         ${PROBE_PIN}@g" ${MARLIN_DIR}/Marlin/src/pins/stm32/pins_BTT_SKR_MINI_E3.h
     sed -i "s@/*#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@" ${MARLIN_DIR}/Marlin/Configuration.h
 fi
-fi
+#if [ -n "$Z_MIN_PROBE_PIN" ]; then
+#    sed -i "s@/*#define Z_MIN_PROBE_PIN .*@#define Z_MIN_PROBE_PIN $Z_MIN_PROBE_PIN@" ${MARLIN_DIR}/Marlin/Configuration.h
+#fi
 
+
+
+
+#SPEED AND ACCELERATION CHANGES
+sed -i "s@#define DEFAULT_MAX_FEEDRATE.*@#define DEFAULT_MAX_FEEDRATE          { 500, 500, 20, 70 }@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_MAX_ACCELERATION .*@#define DEFAULT_MAX_ACCELERATION      { 2500, 2500, 25000, 5000 }@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/.*#define LIMITED_MAX_ACCEL_EDITING@#define LIMITED_MAX_ACCEL_EDITING@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_ACCELERATION .*@#define DEFAULT_ACCELERATION          2000@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_RETRACT_ACCELERATION .*@#define DEFAULT_RETRACT_ACCELERATION          500@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_TRAVEL_ACCELERATION .*@#define DEFAULT_TRAVEL_ACCELERATION          4000@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define JUNCTION_DEVIATION_MM .*@#define JUNCTION_DEVIATION_MM 0.04@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 #Add PURGE FEED RATE, bugfix for 2.0.2
@@ -272,6 +369,7 @@ sed -i "s@/.*#define INCH_MODE_SUPPORT@#define FILAMENT_UNLOAD_PURGE_FEEDRATE 25
 sed -i "s@/*#define MIN_SOFTWARE_ENDSTOP_Z@//#define MIN_SOFTWARE_ENDSTOP_Z@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define DEBUG_LEVELING_FEATURE@#define DEBUG_LEVELING_FEATURE@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define TMC_DEBUG@  #define TMC_DEBUG@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
 
 (cd ${MARLIN_DIR}; ${PLATFORMIO_DIR}/penv/Scripts/platformio run)
 

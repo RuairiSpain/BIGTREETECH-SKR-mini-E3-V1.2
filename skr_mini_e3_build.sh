@@ -22,22 +22,20 @@ CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurat
 CONFIGURATION_PATH="BigTreeTech/SKR Mini E3 1.2" 
 
 # Step 4 printer size and (optional) Hotend PID  values, comment PID out 3 lines if you want the defaults
-X_BED_SIZE=230
-Y_BED_SIZE=230
+X_BED_SIZE=228
+Y_BED_SIZE=228
 Z_MAX_POS=220
 
 Kp="23.24"
 Ki="2.03"
 Kd="66.60"
 
-Print max X Y Z to set bed size and max Z print volume
-
 # Step 5. BLtouch enable (ture) disable (false)
 PROBE="BLTOUCH" #Options:"PROBE_MANUALLY" 'FIX_MOUNTED_PROBE' 'NOZZLE_AS_PROBE' 'Z_PROBE_SERVO_NR' 'TOUCH_MI_PROBE' 'Z_PROBE_SLED' 'RACK_AND_PINION_PROBE'
 #Choose the type of bed leveling system you require
 BED_LEVELING="AUTO_BED_LEVELING_BILINEAR" #Options: "AUTO_BED_LEVELING_3POINT" "AUTO_BED_LEVELING_LINEAR" "AUTO_BED_LEVELING_BILINEAR" "AUTO_BED_LEVELING_UBL" "MESH_BED_LEVELING"
 # Offset for BLTouch relative to nozzle X, Y, Z.  Negative values left, forward and down
-OFFSETS_XYZ="-60, -12, -2.55"
+OFFSETS_XYZ="-59, -34, -2.0"
 
 # Step 6.  BLTouch in using non-standard pin, ie PROBE pin is PC14
 # comment out line if using BLTouch in using Z-stop (PC2 pin)
@@ -150,11 +148,11 @@ sed -i "s@.*#define ARC_SUPPORT@//#define ARC_SUPPORT@" ${MARLIN_DIR}/Marlin/Con
 
 # personal tweaks
 sed -i 's@#define STRING_CONFIG_H_AUTHOR .*@#define STRING_CONFIG_H_AUTHOR "SKR E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "ENDER SKR E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "Lapido E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define SHOW_BOOTSCREEN@//#define SHOW_BOOTSCREEN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define SHOW_CUSTOM_BOOTSCREEN@//#define SHOW_CUSTOM_BOOTSCREEN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IMAGE@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@/.*#define STARTUP_COMMANDS .*@#define STARTUP_COMMANDS "G28; G1 X5 Y5 Z5 F1500"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+#sed -i 's@/.*#define STARTUP_COMMANDS .*@#define STARTUP_COMMANDS "G1 X0 Y0 Z20 F3000"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 #MARLIN 2.0 Spped features!
 #TURN OFF ALL 3 S Curve, Linear adv and Junction Dev, testing extruder skipping
@@ -312,7 +310,7 @@ sed -i "s@#define MESH_BED_LEVELING@//#define MESH_BED_LEVELING@" ${MARLIN_DIR}/
 sed -i "s@/*#define MESH_BED_LEVELING@#define MESH_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
 ;;
 esac
-sed -i "s@#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 5@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 10@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 # Bed leveling settings
@@ -321,13 +319,13 @@ sed -i "s@/*#define MESH_EDIT_MENU@#define MESH_EDIT_MENU@" ${MARLIN_DIR}/Marlin
 
 #LCD menu for bed leveling with manual paper test
 sed -i "s@/*#define LEVEL_CENTER_TOO@#define LEVEL_CENTER_TOO\n#define LEVEL_CORNERS_INSET 30@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define LEVEL_CORNERS_INSET .*@#define LEVEL_CORNERS_INSET 20@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@.*#define LEVEL_CORNERS_INSET .*@#define LEVEL_CORNERS_INSET 28@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define LEVEL_CORNERS_INSET_LFRB { 30, 30, 30, 30 }@#define LEVEL_CORNERS_INSET_LFRB { 28, 28, 28, 28 } @g" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 
 if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed leveling
-  sed -i "s@#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 5@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 3@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define ABL_BILINEAR_SUBDIVISION@#define ABL_BILINEAR_SUBDIVISION@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { ${OFFSETS_XYZ} }@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@#define XY_PROBE_SPEED .*@#define XY_PROBE_SPEED 3000@" ${MARLIN_DIR}/Marlin/Configuration.h
@@ -356,12 +354,12 @@ fi
 
 
 #SPEED AND ACCELERATION CHANGES
-sed -i "s@#define DEFAULT_MAX_FEEDRATE.*@#define DEFAULT_MAX_FEEDRATE          { 500, 500, 20, 70 }@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@#define DEFAULT_MAX_ACCELERATION .*@#define DEFAULT_MAX_ACCELERATION      { 2500, 2500, 25000, 5000 }@" ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i "s@#define DEFAULT_MAX_FEEDRATE.*@#define DEFAULT_MAX_FEEDRATE          { 500, 500, 20, 70 }@" ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i "s@#define DEFAULT_MAX_ACCELERATION .*@#define DEFAULT_MAX_ACCELERATION      { 2500, 2500, 25000, 5000 }@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/.*#define LIMITED_MAX_ACCEL_EDITING@#define LIMITED_MAX_ACCEL_EDITING@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@#define DEFAULT_ACCELERATION .*@#define DEFAULT_ACCELERATION          2000@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@#define DEFAULT_RETRACT_ACCELERATION .*@#define DEFAULT_RETRACT_ACCELERATION          500@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@#define DEFAULT_TRAVEL_ACCELERATION .*@#define DEFAULT_TRAVEL_ACCELERATION          4000@" ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i "s@#define DEFAULT_ACCELERATION .*@#define DEFAULT_ACCELERATION          2000@" ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i "s@#define DEFAULT_RETRACT_ACCELERATION .*@#define DEFAULT_RETRACT_ACCELERATION          500@" ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i "s@#define DEFAULT_TRAVEL_ACCELERATION .*@#define DEFAULT_TRAVEL_ACCELERATION          4000@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@#define JUNCTION_DEVIATION_MM .*@#define JUNCTION_DEVIATION_MM 0.04@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
@@ -390,7 +388,8 @@ git push --set-upstream backup ${SHORT_BRANCH}
 #git status
 #cd ..
 #git checkout -t origin/${SHORT_BRANCH}
-#git add .
-#git commit -m "New build for ${SHORT_BOARD} with branch ${SHORT_BRANCH}"
-#git push
-#git status
+git add .
+now=$(date  +"%r on %d-%m-%Y")
+git commit -m "Automatic build $(now) for ${SHORT_BOARD} on branch ${SHORT_BRANCH}"
+git push
+git status

@@ -153,15 +153,15 @@ sed -i "s@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IM
 #sed -i 's@/.*#define STARTUP_COMMANDS .*@#define STARTUP_COMMANDS "G1 X0 Y0 Z20 F3000"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 #MARLIN 2.0 Seed features!
-echo "Turn off Linear adv, SCurve and Junction Deviation and enable classic Jerk features (Extruder stepper is skipping with 2.0 speed features)"
-#TURN OFF ALL 3 S Curve, Linear adv and Junction Dev, testing extruder skipping
-sed -i "s@#define S_CURVE_ACCELERATION@//#define S_CURVE_ACCELERATION@g" ${MARLIN_DIR}/Marlin/Configuration.h
+echo "Turn off Linear advance (Extruder stepper is skipping with 2.0 speed features)"
+#TURN OFF Linear adv because testing shows extruder skipping/skewaking
+sed -i "s@#define S_CURVE_ACCELERATION@#define S_CURVE_ACCELERATION@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@#define LIN_ADVANCE@//#define LIN_ADVANCE@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i "s@#define LIN_ADVANCE_K .*@  #define LIN_ADVANCE_K 0.05@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i "s@#define JUNCTION_DEVIATION_MM .*@  #//define JUNCTION_DEVIATION_MM 0.01@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define LIN_ADVANCE_K .*@  #define LIN_ADVANCE_K 0.00@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i "s@#define JUNCTION_DEVIATION_MM .*@  #define JUNCTION_DEVIATION_MM 0.01@g" ${MARLIN_DIR}/Marlin/Configuration.h
 #Old Jerk settings
-sed -i "s@/.*#define CLASSIC_JERK@#define CLASSIC_JERK@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/.*#define LIMITED_JERK_EDITING @#define LIMITED_JERK_EDITING@g" ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i "s@/.*#define CLASSIC_JERK@#define CLASSIC_JERK@g" ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i "s@/.*#define LIMITED_JERK_EDITING @#define LIMITED_JERK_EDITING@g" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 echo "Set basic settings"
@@ -328,9 +328,14 @@ sed -i "s@.*#define LEVEL_CORNERS_INSET_LFRB { 30, 30, 30, 30 }@#define LEVEL_CO
 
 echo "BED LEVELING advanced updates"
 if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed leveling
-  sed -i "s@#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 3@" ${MARLIN_DIR}/Marlin/Configuration.h
-  sed -i "s@/*#define ABL_BILINEAR_SUBDIVISION@#define ABL_BILINEAR_SUBDIVISION@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { ${OFFSETS_XYZ} }@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 53@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define ABL_BILINEAR_SUBDIVISION@#define ABL_BILINEAR_SUBDIVISION@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define MESH_EDIT_GFX_OVERLAY@#define MESH_EDIT_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i 's@/*#define Z_PROBE_END_SCRIPT .*"@#define Z_PROBE_END_SCRIPT "G1 Z15 F12000\nG1 X0 Y0"@' ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define G26_MESH_VALIDATION@define G26_MESH_VALIDATION@" ${MARLIN_DIR}/Marlin/Configuration.h
+
+  sed -i "s@/*UBL_Z_RAISE_WHEN_OFF_MESH@ UBL_Z_RAISE_WHEN_OFF_MESH@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@#define XY_PROBE_SPEED .*@#define XY_PROBE_SPEED 3000@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 10@g" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define EXTRAPOLATE_BEYOND_GRID@#define EXTRAPOLATE_BEYOND_GRID@g" ${MARLIN_DIR}/Marlin/Configuration.h
@@ -358,12 +363,12 @@ fi
 
 echo "SPEED AND ACCELERATION features"
 #SPEED AND ACCELERATION CHANGES
-#sed -i "s@#define DEFAULT_MAX_FEEDRATE.*@#define DEFAULT_MAX_FEEDRATE          { 500, 500, 20, 70 }@" ${MARLIN_DIR}/Marlin/Configuration.h
-#sed -i "s@#define DEFAULT_MAX_ACCELERATION .*@#define DEFAULT_MAX_ACCELERATION      { 2500, 2500, 25000, 5000 }@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_MAX_FEEDRATE.*@#define DEFAULT_MAX_FEEDRATE          { 500, 500, 20, 70 }@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_MAX_ACCELERATION .*@#define DEFAULT_MAX_ACCELERATION      { 2500, 2500, 25000, 5000 }@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/.*#define LIMITED_MAX_ACCEL_EDITING@#define LIMITED_MAX_ACCEL_EDITING@" ${MARLIN_DIR}/Marlin/Configuration.h
-#sed -i "s@#define DEFAULT_ACCELERATION .*@#define DEFAULT_ACCELERATION          2000@" ${MARLIN_DIR}/Marlin/Configuration.h
-#sed -i "s@#define DEFAULT_RETRACT_ACCELERATION .*@#define DEFAULT_RETRACT_ACCELERATION          500@" ${MARLIN_DIR}/Marlin/Configuration.h
-#sed -i "s@#define DEFAULT_TRAVEL_ACCELERATION .*@#define DEFAULT_TRAVEL_ACCELERATION          4000@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_ACCELERATION .*@#define DEFAULT_ACCELERATION          2000@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_RETRACT_ACCELERATION .*@#define DEFAULT_RETRACT_ACCELERATION          500@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define DEFAULT_TRAVEL_ACCELERATION .*@#define DEFAULT_TRAVEL_ACCELERATION          4000@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@#define JUNCTION_DEVIATION_MM .*@#define JUNCTION_DEVIATION_MM 0.04@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 

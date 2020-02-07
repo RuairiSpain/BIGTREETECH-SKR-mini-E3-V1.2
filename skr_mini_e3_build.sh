@@ -132,7 +132,7 @@ sed -i "s@/*#define ENDSTOP_INTERRUPTS_FEATURE@#define ENDSTOP_INTERRUPTS_FEATUR
 sed -i "s@#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@//#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define FAN_SOFT_PWM@#define FAN_SOFT_PWM@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/*#define SOFT_ENDSTOPS_MENU_ITEM@#define SOFT_ENDSTOPS_MENU_ITEM@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/*#define DISABLE_M503 @#define DISABLE_M503@" ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i "s@/*#define DISABLE_M503 @#define DISABLE_M503@" ${MARLIN_DIR}/Marlin/Configuration.h
 # beware https://github.com/MarlinFirmware/Marlin/pull/16143
 sed -i "s@.*#define SD_CHECK_AND_RETRY@#define SD_CHECK_AND_RETRY@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 # reduce Hotend fan PWM frequency
@@ -346,7 +346,8 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
   sed -i "s@/*#define BABYSTEP_ZPROBE_GFX_OVERLAY@#define BABYSTEP_ZPROBE_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   #G26 Mesh validation command setup
-  if [ "$BED_LEVELING" = "AUTO_BED_LEVELING_UBL" || "$BED_LEVELING" = "AUTO_BED_LEVELING_BILINEAR"]; then 
+  if [ "$BED_LEVELING" = "AUTO_BED_LEVELING_UBL"] || [ "$BED_LEVELING" = "AUTO_BED_LEVELING_BILINEAR" ]; then 
+    echo "G26 Mesh validation command setup"
     sed -i "s@/*#define G26_MESH_VALIDATION@#define G26_MESH_VALIDATION@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define MESH_TEST_LAYER_HEIGHT .*@#define MESH_TEST_LAYER_HEIGHT 0.3@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define MESH_TEST_HOTEND_TEMP .*@#define MESH_TEST_HOTEND_TEMP 220@" ${MARLIN_DIR}/Marlin/Configuration.h

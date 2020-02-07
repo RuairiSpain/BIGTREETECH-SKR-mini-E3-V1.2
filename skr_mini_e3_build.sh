@@ -357,6 +357,12 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
     sed -i "s@#define GRID_MAX_POINTS_X .*@    #define GRID_MAX_POINTS_X 10@g" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@#define MESH_INSET .*@#define MESH_INSET 60@g" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define UBL_Z_RAISE_WHEN_OFF_MESH 2.5@#define UBL_Z_RAISE_WHEN_OFF_MESH 2.5@g" ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i "s@/*#define PROBE_PT_1_X 15@#define PROBE_PT_1_X 60@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_1_Y 180@#define PROBE_PT_1_Y 210@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_2_X 15@#define PROBE_PT_2_X 60@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_2_Y 20@#define PROBE_PT_2_Y 40@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_3_X 170@#define PROBE_PT_3_X 210@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_3_Y 20@#define PROBE_PT_3_Y 40@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
    
   fi
   sed -i "s@/*#define PROBING_HEATERS_OFF @#define PROBING_HEATERS_OFF@" ${MARLIN_DIR}/Marlin/Configuration.h

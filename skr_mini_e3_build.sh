@@ -83,6 +83,7 @@ curl -k "${CONFIGURATION_PREFIX}${CONFIGURATION_PATH}/Configuration_adv.h"  --ou
 cd ../..
 
 #Start by modifying the PlatformIO config
+sed -i "s@core_dir = PlatformIO@@" ${MARLIN_DIR}/platformio.ini
 sed -i "s@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@" ${MARLIN_DIR}/platformio.ini
 sed --quiet -E '$!N; /^(.*)\n\1$/!P; D' ${MARLIN_DIR}/platformio.ini > /dev/null 2>&1
 #Add our base board to the platformIO config

@@ -1,0 +1,85 @@
+; ENABLE UBL MESH
+M502; CLear EEPROM
+M500; Print EEPROM to terminal
+M501 ; Load fresh EEPROM
+M140 220; Set bed temperature
+M190 S220; Wait for bed temperature
+G29 P1; Probe bed
+G29 T; Print Mesh to terminal
+G29 S1; Save to mesh slot 1 (1-7 slots)
+G29 F 10.0;Set fade height to 10mm, fade alows taller print to use mesh for first layers and reduce it's offset as it does each layer level, by 10mm vertically mesh is flattened
+G29 A;Activate UBL. Recommended to be at least 10mm.
+M500;Save UBL to EEPROM
+
+;RESET Z-OFFSET
+G28; Home
+G1 X110 Y 110; roughly center
+;Paper test on Nozzle in center position (to calculate Z_offset)
+M211 S0; turn off end stop restriction negative Z
+G91; Use relative positioning
+;--------------------------------
+; Put paper under nozzle on bed
+; Move nozzle up/down until you get friction on the paper under the nozzle
+G1 Z-1.0; Move nozzle down 1mm
+G1 Z0.1; Move nozzle up .1mm
+G1 Z-0.05; Move nozzle down 0.5mm
+;Keep moving until paper friction
+;--------------------------------
+M114; read Z offset (Z -1.25)
+G91; Use absolute positioning
+M851 Z-1.25; Set the Z-Offset to -1.25mm (Update Marlin source code Z-Offset value so it's stored as well just in case you re-flash your ROM)
+M503; Read EEPROM on terminal
+M500; Save EEPROM, no need to re-flash because saved to EEPROM, but a good backup scenario
+
+;Start MESH Validation test print (Pretty matrix with circles)
+G28; Home
+G26 P10; Do test print with a prime line of 10mm to look for bad mesh coordinates
+;--------------------------------
+;If mesh is all good
+G29 S1; Save mesh to slot 1
+M500; Save to EEPROM
+;--------------------------------
+;If a mesh coordinate bad (too high/low)
+g28; Home
+g29 T; Print mesh to terminal
+    In Menu:
+        Prepare ->
+        Unified Bed Levelling ->
+        Mesh Edit ->
+        Displays GRID
+        Scroll and select your bad coordinate
+            Mesh Editor: 0.595
+            Coordinate too close -> increase (Example Change coordinate from 0.595 -> 0.610)
+            Coordinate too far -> decrease
+            Then Marlin moves to neighbouring (8 points) es so you can adjust (smooth) mesh offsets
+        Edit any other points that need fixing/editing
+        Hold display scroll wheel to exit editing mesh
+    In Terminal:
+        G29 T; Output new mesh to terminal
+        ;Hopefully, mesh coordinates are all good
+        G29 S1; Save mesh to slot 1
+        M500; Save to EEPROM
+        G28; Home
+        G26 P10; Re-test print
+
+
+
+
+Potentially probing may miss unreachable mesh points
+G28; Home
+G26 P10; Build mesh
+    ;In terminal, will see 'Probe failed'
+G29 P3; Auto-fill any unreachable points
+
+G28; Home
+G26 P10; Re-test print
+G29 S1; Save mesh to slot 1
+M500; Save to EEPROM
+G28; Home
+G26 P10; Re-test print
+
+Potentially can have a skew in the bed, can tilt whole coordinate system for skew
+;3 point level test
+G29 L1; Load mesh from slot 1
+G29 J; Check front 2 corners and back-center (triangle movement, no print)\
+; Now print g-code level file, to test adhesion and mesh levels

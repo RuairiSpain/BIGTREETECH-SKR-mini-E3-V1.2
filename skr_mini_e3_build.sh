@@ -33,7 +33,7 @@ Kd="66.60"
 # Step 5. BLtouch enable (ture) disable (false)
 PROBE="BLTOUCH" #Options:"PROBE_MANUALLY" 'FIX_MOUNTED_PROBE' 'NOZZLE_AS_PROBE' 'Z_PROBE_SERVO_NR' 'TOUCH_MI_PROBE' 'Z_PROBE_SLED' 'RACK_AND_PINION_PROBE'
 #Choose the type of bed leveling system you require
-BED_LEVELING="AUTO_BED_LEVELING_BILINEAR" #Options: "AUTO_BED_LEVELING_3POINT" "AUTO_BED_LEVELING_LINEAR" "AUTO_BED_LEVELING_BILINEAR" "AUTO_BED_LEVELING_UBL" "MESH_BED_LEVELING"
+BED_LEVELING="AUTO_BED_LEVELING_UBL" #Options: "AUTO_BED_LEVELING_3POINT" "AUTO_BED_LEVELING_LINEAR" "AUTO_BED_LEVELING_BILINEAR" "AUTO_BED_LEVELING_UBL" "MESH_BED_LEVELING"
 # Offset for BLTouch relative to nozzle X, Y, Z.  Negative values left, forward and down
 OFFSETS_XYZ="-59, -34, -2.0"
 
@@ -273,14 +273,14 @@ sed -i "s@/*#define NOZZLE_AS_PROBE@#define NOZZLE_AS_PROBE@" ${MARLIN_DIR}/Marl
 ;;
 'Z_PROBE_SERVO_NR')
 sed -i "s@/*#define Z_PROBE_SERVO_NR .*@#define Z_PROBE_SERVO_NR 0@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/*##define Z_SERVO_ANGLES .*@##define Z_SERVO_ANGLES { 70, 0 } @" ${MARLIN_DIR}/Marlin/Config
+sed -i "s@/*#define Z_SERVO_ANGLES .*@#define Z_SERVO_ANGLES { 70, 0 } @" ${MARLIN_DIR}/Marlin/Config
 ;;
 'TOUCH_MI_PROBE')
 sed -i "s@/*#define TOUCH_MI_PROBE@#define TOUCH_MI_PROBE@" ${MARLIN_DIR}/Marlin/Configuration.h
 ;;
 'Z_PROBE_SLED')
 sed -i "s@/*#define Z_PROBE_SLED@#define Z_PROBE_SLED@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/*/#define SLED_DOCKING_OFFSET .*@/#define SLED_DOCKING_OFFSET 5@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*#define SLED_DOCKING_OFFSET .*@/#define SLED_DOCKING_OFFSET 5@" ${MARLIN_DIR}/Marlin/Configuration.h
 ;;
 'RACK_AND_PINION_PROBE')
 sed -i "s@/*#define RACK_AND_PINION_PROBE@#define RACK_AND_PINION_PROBE@" ${MARLIN_DIR}/Marlin/Configuration.h
@@ -344,6 +344,15 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
   sed -i "s@/*#define BABYSTEP_DISPLAY_TOTAL@#define BABYSTEP_DISPLAY_TOTAL@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i "s@/*#define BABYSTEP_ZPROBE_OFFSET@#define BABYSTEP_ZPROBE_OFFSET@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i "s@/*#define BABYSTEP_ZPROBE_GFX_OVERLAY@#define BABYSTEP_ZPROBE_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+  #G26 Mesh validation command setup
+  if [ "$BED_LEVELING" != "AUTO_BED_LEVELING_UBL" ]; then 
+    sed -i "s@/*#define G26_MESH_VALIDATION@define G26_MESH_VALIDATION@" ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i "s@/*#define MESH_TEST_LAYER_HEIGHT .*@#define MESH_TEST_LAYER_HEIGHT 0.3@" ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i "s@/*#define MESH_TEST_HOTEND_TEMP .*@#define MESH_TEST_HOTEND_TEMP 220@" ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i "s@/*#define MESH_TEST_BED_TEMP .*@define MESH_TEST_BED_TEMP 70@" ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i "s@/*#define G26_XY_FEEDRATE .*@define G26_XY_FEEDRATE 20@" ${MARLIN_DIR}/Marlin/Configuration.h
+  fi
 fi
 
 # bltouch probe as z-endstop on z-endstop connector

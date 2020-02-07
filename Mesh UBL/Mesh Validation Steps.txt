@@ -2,18 +2,24 @@
 M502; CLear EEPROM
 M500; Print EEPROM to terminal
 M501 ; Load fresh EEPROM
-M140 220; Set bed temperature
-M190 S220; Wait for bed temperature
-G29 P1; Probe bed
-G29 T; Print Mesh to terminal
-G29 S1; Save to mesh slot 1 (1-7 slots)
-G29 F 10.0;Set fade height to 10mm, fade alows taller print to use mesh for first layers and reduce it's offset as it does each layer level, by 10mm vertically mesh is flattened
-G29 A;Activate UBL. Recommended to be at least 10mm.
-M500;Save UBL to EEPROM
+M140 70; Set bed temperature
+M190 S70; Wait for bed temperature
+G28             ; Home XYZ.
+G29 P1          ; Do automated probing of the bed.
+G29 P2 B T      ; Manual probing of locations USUALLY NOT NEEDED!!!!
+G29 P3 T        ; Repeat until all mesh points are filled in.
+
+G29 T           ; View the Z compensation values.
+G29 S1          ; Save UBL mesh points to EEPROM.
+G29 F 10.0      ; Set Fade Height for correction at 10.0 mm.
+G29 A           ; Activate the UBL System.
+M500            ; Save current setup. WARNING: UBL will be active at power up, before any `G28`.
+;---------------------------------------------
+
 
 ;RESET Z-OFFSET
 G28; Home
-G1 X110 Y 110; roughly center
+G1 X110 Y110; roughly center
 ;Paper test on Nozzle in center position (to calculate Z_offset)
 M211 S0; turn off end stop restriction negative Z
 G91; Use relative positioning
@@ -26,9 +32,9 @@ G1 Z-0.05; Move nozzle down 0.5mm
 ;Keep moving until paper friction
 ;--------------------------------
 M114; read Z offset (Z -1.25)
-G91; Use absolute positioning
-M851 Z-1.25; Set the Z-Offset to -1.25mm (Update Marlin source code Z-Offset value so it's stored as well just in case you re-flash your ROM)
-M503; Read EEPROM on terminal
+G92; Use absolute positioning
+M851 Z-0.25; Set the Z-Offset to -1.25mm (Update Marlin source code Z-Offset value so it's stored as well just in case you re-flash your ROM)
+M503; Show EEPROM on terminal
 M500; Save EEPROM, no need to re-flash because saved to EEPROM, but a good backup scenario
 
 ;Start MESH Validation test print (Pretty matrix with circles)

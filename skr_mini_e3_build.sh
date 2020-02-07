@@ -346,7 +346,7 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
   sed -i "s@/*#define BABYSTEP_ZPROBE_GFX_OVERLAY@#define BABYSTEP_ZPROBE_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   #G26 Mesh validation command setup
-  if [ "$BED_LEVELING" = "AUTO_BED_LEVELING_UBL"] || [ "$BED_LEVELING" = "AUTO_BED_LEVELING_BILINEAR" ]; then 
+  if [ "$BED_LEVELING" = "AUTO_BED_LEVELING_UBL" ] || [ "$BED_LEVELING" = "AUTO_BED_LEVELING_BILINEAR" ] ; then 
     echo "G26 Mesh validation command setup"
     sed -i "s@/*#define G26_MESH_VALIDATION@#define G26_MESH_VALIDATION@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define MESH_TEST_LAYER_HEIGHT .*@#define MESH_TEST_LAYER_HEIGHT 0.3@" ${MARLIN_DIR}/Marlin/Configuration.h
@@ -391,6 +391,13 @@ sed -i "s@/*#define MIN_SOFTWARE_ENDSTOP_Z@//#define MIN_SOFTWARE_ENDSTOP_Z@" ${
 sed -i "s@/*#define DEBUG_LEVELING_FEATURE@#define DEBUG_LEVELING_FEATURE@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define TMC_DEBUG@  #define TMC_DEBUG@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
+if [ $(whoami) = "ruair" ]; then
+echo "Add silly menu for games (waste space)"
+sed -i "s@/*#define MARLIN_BRICKOUT@#define MARLIN_BRICKOUT@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i "s@/*#define MARLIN_INVADERS@#define MARLIN_INVADERS@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i "s@/*#define MARLIN_SNAKE@#define MARLIN_SNAKE@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i "s@/*#define GAMES_EASTER_EGG@#define GAMES_EASTER_EGG@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+fi
 
 (cd ${MARLIN_DIR}; ${PLATFORMIO_DIR}/penv/Scripts/platformio run)
 

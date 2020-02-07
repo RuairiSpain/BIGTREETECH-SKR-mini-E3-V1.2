@@ -333,7 +333,7 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
   sed -i "s@#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 53@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define ABL_BILINEAR_SUBDIVISION@#define ABL_BILINEAR_SUBDIVISION@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define MESH_EDIT_GFX_OVERLAY@#define MESH_EDIT_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration.h
-  sed -i 's@/*#define Z_PROBE_END_SCRIPT .*"@#define Z_PROBE_END_SCRIPT "G1 Z15 F12000\nG1 X0 Y0"@' ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i 's@/*#define Z_PROBE_END_SCRIPT .*"@#define Z_PROBE_END_SCRIPT "G1 Z10,G1 X0 Y0"@' ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define G26_MESH_VALIDATION@define G26_MESH_VALIDATION@" ${MARLIN_DIR}/Marlin/Configuration.h
 
   sed -i "s@/*UBL_Z_RAISE_WHEN_OFF_MESH@ UBL_Z_RAISE_WHEN_OFF_MESH@" ${MARLIN_DIR}/Marlin/Configuration.h

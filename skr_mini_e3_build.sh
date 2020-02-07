@@ -346,7 +346,7 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
   sed -i "s@/*#define BABYSTEP_ZPROBE_GFX_OVERLAY@#define BABYSTEP_ZPROBE_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   #G26 Mesh validation command setup
-  if [ "$BED_LEVELING" != "AUTO_BED_LEVELING_UBL" ]; then 
+  if [ "$BED_LEVELING" = "AUTO_BED_LEVELING_UBL" || "$BED_LEVELING" = "AUTO_BED_LEVELING_BILINEAR"]; then 
     sed -i "s@/*#define G26_MESH_VALIDATION@#define G26_MESH_VALIDATION@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define MESH_TEST_LAYER_HEIGHT .*@#define MESH_TEST_LAYER_HEIGHT 0.3@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define MESH_TEST_HOTEND_TEMP .*@#define MESH_TEST_HOTEND_TEMP 220@" ${MARLIN_DIR}/Marlin/Configuration.h

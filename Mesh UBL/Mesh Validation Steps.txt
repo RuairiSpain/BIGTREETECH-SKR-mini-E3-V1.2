@@ -5,7 +5,9 @@ M501 ; Load fresh EEPROM
 M140 70; Set bed temperature
 M190 S70; Wait for bed temperature
 G28             ; Home XYZ.
-G29 P1          ; Do automated probing of the bed.
+G29 P1          ; Do automated probing of the bed
+
+G29 P2 H0.5     ;While manually probing set nozzle to begin at height 0.5 (quicker than manually moving down with scroll wheel)
 G29 P2 B T      ; Manual probing of locations USUALLY NOT NEEDED!!!!
 G29 P3 T        ; Repeat until all mesh points are filled in.
 

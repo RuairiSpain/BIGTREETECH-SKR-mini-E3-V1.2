@@ -22,9 +22,9 @@ CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurat
 CONFIGURATION_PATH="BigTreeTech/SKR Mini E3 1.2" 
 
 # Step 4 printer size and (optional) Hotend PID  values, comment PID out 3 lines if you want the defaults
-X_BED_SIZE=228
-Y_BED_SIZE=228
-Z_MAX_POS=220
+X_BED_SIZE=226
+Y_BED_SIZE=226
+Z_MAX_POS=226
 
 Kp="23.24"
 Ki="2.03"
@@ -311,7 +311,7 @@ sed -i "s@#define MESH_BED_LEVELING@//#define MESH_BED_LEVELING@" ${MARLIN_DIR}/
 sed -i "s@/*#define MESH_BED_LEVELING@#define MESH_BED_LEVELING@" ${MARLIN_DIR}/Marlin/Configuration.h
 ;;
 esac
-sed -i "s@#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 10@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 5@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 # Bed leveling settings
@@ -344,16 +344,24 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
   sed -i "s@/*#define BABYSTEP_DISPLAY_TOTAL@#define BABYSTEP_DISPLAY_TOTAL@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i "s@/*#define BABYSTEP_ZPROBE_OFFSET@#define BABYSTEP_ZPROBE_OFFSET@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i "s@/*#define BABYSTEP_ZPROBE_GFX_OVERLAY@#define BABYSTEP_ZPROBE_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i "s@/*#define MULTIPLE_PROBING .*@#define MULTIPLE_PROBING 3@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define Z_CLEARANCE_BETWEEN_PROBES .*@#define Z_CLEARANCE_BETWEEN_PROBES  2@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define Z_CLEARANCE_MULTI_PROBE  .*@#define Z_CLEARANCE_MULTI_PROBE     2@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define Z_AFTER_PROBING  .*@#define Z_CLEARANCE_MULTI_PROBE     2@" ${MARLIN_DIR}/Marlin/Configuration.h
 
-  #G26 Mesh validation command setup
-  if [ "$BED_LEVELING" = "AUTO_BED_LEVELING_UBL" ] || [ "$BED_LEVELING" = "AUTO_BED_LEVELING_BILINEAR" ] ; then 
+  if [ "$BED_LEVELING" = "AUTO_BED_LEVELING_UBL" ]; then 
     echo "G26 Mesh validation command setup"
-    sed -i "s@/*#define G26_MESH_VALIDATION@#define G26_MESH_VALIDATION@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define MESH_TEST_LAYER_HEIGHT .*@#define MESH_TEST_LAYER_HEIGHT 0.3@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define MESH_TEST_HOTEND_TEMP .*@#define MESH_TEST_HOTEND_TEMP 220@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define MESH_TEST_BED_TEMP .*@#define MESH_TEST_BED_TEMP 70@" ${MARLIN_DIR}/Marlin/Configuration.h
-    sed -i "s@/*#define G26_XY_FEEDRATE .*@#define G26_XY_FEEDRATE 20@" ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i "s@#define GRID_MAX_POINTS_X .*@    #define GRID_MAX_POINTS_X 10@g" ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i "s@#define MESH_INSET .*@#define MESH_INSET 60@g" ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i "s@/*#define UBL_Z_RAISE_WHEN_OFF_MESH 2.5@#define UBL_Z_RAISE_WHEN_OFF_MESH 2.5@g" ${MARLIN_DIR}/Marlin/Configuration.h
+   
   fi
+  sed -i "s@/*#define PROBING_HEATERS_OFF @#define PROBING_HEATERS_OFF@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define G26_MESH_VALIDATION@#define G26_MESH_VALIDATION@" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/*#define G26_XY_FEEDRATE .*@#define G26_XY_FEEDRATE 20@" ${MARLIN_DIR}/Marlin/Configuration.h
 fi
 
 # bltouch probe as z-endstop on z-endstop connector

@@ -35,9 +35,10 @@ PROBE="BLTOUCH" #Options:"PROBE_MANUALLY" 'FIX_MOUNTED_PROBE' 'NOZZLE_AS_PROBE' 
 #Choose the type of bed leveling system you require
 BED_LEVELING="AUTO_BED_LEVELING_UBL" #Options: "AUTO_BED_LEVELING_3POINT" "AUTO_BED_LEVELING_LINEAR" "AUTO_BED_LEVELING_BILINEAR" "AUTO_BED_LEVELING_UBL" "MESH_BED_LEVELING"
 # Offset for BLTouch relative to nozzle X, Y, Z.  Negative values left, forward and down
-OFFSETS_X=-59
-OFFSETS_Y=-34
-OFFSETS_Z=-2.0
+OFFSETS_X=59
+OFFSETS_Y=34
+OFFSETS_Z=2.0
+OFFSETS_XYZ="-${OFFSETS_X}, -${OFFSETS_Y}, -${OFFSETS_Z}"
 
 # Step 6.  BLTouch in using non-standard pin, ie PROBE pin is PC14
 # comment out line if using BLTouch in using Z-stop (PC2 pin)
@@ -48,7 +49,7 @@ PROBE_PIN="PC14"
 # MAIN SCRIPT --- ONLY EDIT BELOW HERE IF YOU KNOW WHAT YOU ARE DOING ---
 BOARD="STM32F103RC_bigtree_512K" #base board
 BRANCH=upstream/${BRANCH} #temporary branch to store forked Marlin code
-OFFSETS_XYZ="${OFFSETS_X}, ${OFFSETS_Y}, ${OFFSETS_Z}"
+
 #Check platformIO and install updates
 ${PLATFORMIO_DIR}/penv/Scripts/python -m venv ${PLATFORMIO_DIR}
 ${PLATFORMIO_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
@@ -358,14 +359,14 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
     sed -i "s@/*#define MESH_TEST_HOTEND_TEMP .*@#define MESH_TEST_HOTEND_TEMP 220@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define MESH_TEST_BED_TEMP .*@#define MESH_TEST_BED_TEMP 70@" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@#define GRID_MAX_POINTS_X .*@    #define GRID_MAX_POINTS_X 10@g" ${MARLIN_DIR}/Marlin/Configuration.h
-    sed -i "s@#define MESH_INSET .*@#define MESH_INSET  -${OFFSETS_X}@g" ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i "s@#define MESH_INSET .*@#define MESH_INSET  $OFFSETS_X@g" ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i "s@/*#define UBL_Z_RAISE_WHEN_OFF_MESH 2@#define UBL_Z_RAISE_WHEN_OFF_MESH 2@g" ${MARLIN_DIR}/Marlin/Configuration.h
-    sed -i "s@/*#define PROBE_PT_1_X 15@#define PROBE_PT_1_X -$OFFSETS_X@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-    sed -i "s@/*#define PROBE_PT_1_Y 180@#define PROBE_PT_1_Y ${X_BED_SIZE}@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-    sed -i "s@/*#define PROBE_PT_2_X 15@#define PROBE_PT_2_X -${OFFSETS_X}@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-    sed -i "s@/*#define PROBE_PT_2_Y 20@#define PROBE_PT_2_Y -${OFFSETS_Y}@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-    sed -i "s@/*#define PROBE_PT_3_X 170@#define PROBE_PT_3_X ${X_BED_SIZE}@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
-    sed -i "s@/*#define PROBE_PT_3_Y 20@#define PROBE_PT_3_Y -${OFFSETS_Y}@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_1_X 15@#define PROBE_PT_1_X $OFFSETS_X@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_1_Y 180@#define PROBE_PT_1_Y $X_BED_SIZE@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_2_X 15@#define PROBE_PT_2_X $OFFSETS_X@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_2_Y 20@#define PROBE_PT_2_Y $OFFSETS_Y@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_3_X 170@#define PROBE_PT_3_X $X_BED_SIZE@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i "s@/*#define PROBE_PT_3_Y 20@#define PROBE_PT_3_Y $OFFSETS_Y@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
   fi
   sed -i "s@/*#define PROBING_HEATERS_OFF @#define PROBING_HEATERS_OFF@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define G26_MESH_VALIDATION@#define G26_MESH_VALIDATION@" ${MARLIN_DIR}/Marlin/Configuration.h

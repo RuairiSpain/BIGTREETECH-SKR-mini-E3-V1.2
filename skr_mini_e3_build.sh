@@ -18,7 +18,13 @@ SHORT_BRANCH=bugfix-2.0.x  #2.0.3 #dev-2.1.x #bugfix-2.0.x
 ESTEPS_XYZE="80, 80, 400, 105.68"
 
 #URL to download base configuration to change, script uses Marlin files for BTT SKR Mini E3 1.2 as a starting point
-CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/
+
+if [ "$SHORT_BRANCH" == "bugfix-2.0.x" ]; then
+  CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurations/bugfix-2.0.x/config/examples/
+else
+  CONFIGURATION_PREFIX=https://raw.githubusercontent.com/MarlinFirmware/Configurations/master/config/examples/
+fi
+echo "Configuration example URL: ${CONFIGURATION_PREFIX}"
 CONFIGURATION_PATH="BigTreeTech/SKR Mini E3 1.2" 
 
 # Step 4 printer size and (optional) Hotend PID  values, comment PID out 3 lines if you want the defaults
@@ -326,8 +332,7 @@ sed -i "s@/*#define MESH_EDIT_MENU@#define MESH_EDIT_MENU@" ${MARLIN_DIR}/Marlin
 
 #LCD menu for bed leveling with manual paper test
 echo "LEVEL CORNERS updates"
-sed -i "s@/*#define LEVEL_CENTER_TOO@#define LEVEL_CENTER_TOO\n#define LEVEL_CORNERS_INSET 30@" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@.*#define LEVEL_CORNERS_INSET .*@#define LEVEL_CORNERS_INSET 28@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*#define LEVEL_CENTER_TOO@#define LEVEL_CENTER_TOO@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define LEVEL_CORNERS_INSET_LFRB { 30, 30, 30, 30 }@#define LEVEL_CORNERS_INSET_LFRB { 28, 28, 28, 28 } @g" ${MARLIN_DIR}/Marlin/Configuration.h
 
 

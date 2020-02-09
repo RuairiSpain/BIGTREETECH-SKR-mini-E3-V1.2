@@ -11,7 +11,7 @@ fi
 ${PLATFORMIO_DIR}/penv/Scripts/platformio --version
 
 # Step 2. Marlin Git Branch, example in comments
-SHORT_BRANCH=dev-2.1.x  #2.0.3 #dev-2.1.x #bugfix-2.0.x
+SHORT_BRANCH=bugfix-2.0.x  #2.0.3 #dev-2.1.x #bugfix-2.0.x
 
 # Step 3. Simple configuration tweaks
 #Tweak e-steps for steppers X, Y, Z and E

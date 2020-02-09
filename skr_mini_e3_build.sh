@@ -61,10 +61,10 @@ MARLIN_DIR=./Marlin
 
 echo "Download/Refresh Marlin code in ${MARLIN_DIR}"
 # if marlin code is not downloaded then clone the Marlin git repo
-if [ ! -d  ${MARLIN_DIR} ]
+if [ ! -d  "./${MARLIN_DIR}" ]
 then
   #clone the Marlin repo and checkout the branch
-  git clone -q https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
+  git clone -q https://github.com/MarlinFirmware/Marlin ./${MARLIN_DIR}
   cd ${MARLIN_DIR}
   git checkout ${SHORT_BRANCH}
 else

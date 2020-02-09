@@ -8,7 +8,7 @@ PLATFORMIO_DIR=~/.platformio
 if [ -d "$PLATFORMIO_DIR" ]; then
   python -c "$(curl -kfsSL https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)"
 fi
-${PLATFORMIO_DIR}/penv/Scripts/platformio --version
+platformio --version
 
 # Step 2. Marlin Git Branch, example in comments
 SHORT_BRANCH=bugfix-2.0.x  #2.0.3 #dev-2.1.x #bugfix-2.0.x
@@ -51,8 +51,8 @@ BOARD="STM32F103RC_bigtree_512K" #base board
 BRANCH=upstream/${BRANCH} #temporary branch to store forked Marlin code
 
 #Check platformIO and install updates
-${PLATFORMIO_DIR}/penv/Scripts/python -m venv ${PLATFORMIO_DIR}
-${PLATFORMIO_DIR}/penv/Scripts/pip install -U platformio --no-cache-dir
+python -m venv ${PLATFORMIO_DIR}
+pip install -U platformio --no-cache-dir
 #URL encode configuration path space -> %20, etc.
 CONFIGURATION_PATH=$(python -c $'try: import urllib.request as urllib\nexcept: import urllib\nimport sys\nsys.stdout.write(
 urllib.quote(input()))' <<< ${CONFIGURATION_PATH})
@@ -416,7 +416,7 @@ sed -i "s@/*#define MARLIN_SNAKE@#define MARLIN_SNAKE@" ${MARLIN_DIR}/Marlin/Con
 sed -i "s@/*#define GAMES_EASTER_EGG@#define GAMES_EASTER_EGG@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 fi
 
-(cd ${MARLIN_DIR}; ${PLATFORMIO_DIR}/penv/Scripts/platformio run)
+(cd ${MARLIN_DIR}; platformio run)
 
 grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 

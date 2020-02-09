@@ -161,7 +161,7 @@ sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "Lapido E3"
 sed -i "s@.*#define SHOW_BOOTSCREEN@//#define SHOW_BOOTSCREEN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define SHOW_CUSTOM_BOOTSCREEN@//#define SHOW_CUSTOM_BOOTSCREEN@" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IMAGE@" ${MARLIN_DIR}/Marlin/Configuration.h
-#sed -i 's@/.*#define STARTUP_COMMANDS .*@#define STARTUP_COMMANDS "G1 X0 Y0 Z20 F3000"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@/.*#define STARTUP_COMMANDS .*@#define STARTUP_COMMANDS "M30 firmware.bin"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 #MARLIN 2.0 Seed features!
 echo "Turn off Linear advance (Extruder stepper is skipping with 2.0 speed features)"

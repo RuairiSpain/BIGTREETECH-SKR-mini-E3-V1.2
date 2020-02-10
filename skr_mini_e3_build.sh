@@ -80,6 +80,7 @@ else
   git fetch --all
   git reset --hard HEAD
   git checkout ${SHORT_BRANCH}
+  git pull -f
 fi
 
 

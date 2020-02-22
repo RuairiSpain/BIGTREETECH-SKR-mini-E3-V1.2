@@ -83,12 +83,6 @@ else
   git pull -f
 fi
 
-git remote add M35 https://github.com/rmcbc/Marlin.git
-git fetch M35
-ga && gc "Save marlin M35 changes"
-git merge M35/rmc-SCREWS_TILT_ADJUST
-
-
 echo "Download Configuration tempaltes"
 # download template Configuration.h and Configuration_adv.h files for the example board
 cd Marlin
@@ -394,7 +388,7 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
 fi
 
 # bltouch probe as z-endstop on z-endstop connector
-# sed -i "s@/*#define Z_SAFE_HOMING@#define Z_SAFE_HOMING@" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/*#define Z_SAFE_HOMING@#define Z_SAFE_HOMING@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 echo "PROBE PIN updates"
 # use probe connector as z-endstop connector
@@ -449,6 +443,10 @@ if [ $(whoami) = "ruair" ]; then
   cd ${MARLIN_DIR}
   #git checkout -t backup/${SHORT_BRANCH}
   git pull
+  git remote add M35 https://github.com/rmcbc/Marlin.git
+  git fetch M35
+  ga && gc "Saved marlin before M35 branch changes"
+  git merge M35/rmc-SCREWS_TILT_ADJUST
   git add .
   git commit -m "New code on ${now} for ${SHORT_BOARD} using branch ${SHORT_BRANCH}"
   git push --set-upstream backup ${SHORT_BRANCH}

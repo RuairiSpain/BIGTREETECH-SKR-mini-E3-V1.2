@@ -430,6 +430,14 @@ sed -i "s@/*#define MARLIN_SNAKE@#define MARLIN_SNAKE@" ${MARLIN_DIR}/Marlin/Con
 sed -i "s@/*#define GAMES_EASTER_EGG@#define GAMES_EASTER_EGG@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 fi
 
+if [ $(whoami) = "ruair" ]; then
+  #git remote add M35 https://github.com/rmcbc/Marlin.git
+  git fetch M35
+  git add .
+  git commit -m "Saved marlin before M35 branch changes"
+  git merge M35/rmc-SCREWS_TILT_ADJUST
+fi
+
 (cd ${MARLIN_DIR}; platformio run)
 
 grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
@@ -443,10 +451,7 @@ if [ $(whoami) = "ruair" ]; then
   cd ${MARLIN_DIR}
   #git checkout -t backup/${SHORT_BRANCH}
   git pull
-  git remote add M35 https://github.com/rmcbc/Marlin.git
-  git fetch M35
-  ga && gc "Saved marlin before M35 branch changes"
-  git merge M35/rmc-SCREWS_TILT_ADJUST
+
   git add .
   git commit -m "New code on ${now} for ${SHORT_BOARD} using branch ${SHORT_BRANCH}"
   git push --set-upstream backup ${SHORT_BRANCH}

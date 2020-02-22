@@ -83,6 +83,10 @@ else
   git pull -f
 fi
 
+git remote add M35 https://github.com/rmcbc/Marlin.git
+git fetch M35
+ga && gc "Save marlin M35 changes"
+git merge M35/rmc-SCREWS_TILT_ADJUST
 
 
 echo "Download Configuration tempaltes"
@@ -179,10 +183,10 @@ sed -i "s@#define JUNCTION_DEVIATION_MM .*@  #define JUNCTION_DEVIATION_MM 0.01@
 echo "Set basic settings"
 sed -i "s@/*#define MONITOR_DRIVER_STATUS@#define MONITOR_DRIVER_STATUS@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i "s@/.*#define Z_MIN_PROBE_REPEATABILITY_TEST@  #define Z_MIN_PROBE_REPEATABILITY_TEST@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/.*#define RESTORE_LEVELING_AFTER_G28@  #define RESTORE_LEVELING_AFTER_G28@g" ${MARLIN_DIR}/Marlin/Configuration.h
+
 sed -i "s@.*#define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_X_POINT (X_BED_SIZE / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE) / 2)@  #define Z_SAFE_HOMING_Y_POINT (Y_BED_SIZE / 2)@g" ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i "s@/.*#define Z_HOMING_HEIGHT .*@#define Z_HOMING_HEIGHT 10@g" ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i "s@/.*#define Z_HOMING_HEIGHT .*@#define Z_HOMING_HEIGHT 5@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@/.*#define NOZZLE_CLEAN_FEATURE@  #define NOZZLE_CLEAN_FEATURE@g" ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i "s@.*#define ENDSTOPS_ALWAYS_ON_DEFAULT@#define ENDSTOPS_ALWAYS_ON_DEFAULT@g" ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i "s@.*#define INDIVIDUAL_AXIS_HOMING_MENU@#define INDIVIDUAL_AXIS_HOMING_MENU@" ${MARLIN_DIR}/Marlin/Configuration.h
@@ -344,11 +348,12 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
   sed -i "s@/*#define ABL_BILINEAR_SUBDIVISION@#define ABL_BILINEAR_SUBDIVISION@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define MESH_EDIT_GFX_OVERLAY@#define MESH_EDIT_GFX_OVERLAY@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i 's@/*#define Z_PROBE_END_SCRIPT .*"@#define Z_PROBE_END_SCRIPT "G1 Z10,G1 X0 Y0"@' ${MARLIN_DIR}/Marlin/Configuration.h
-
+  #sed -i "s@/.*#define RESTORE_LEVELING_AFTER_G28@  #define RESTORE_LEVELING_AFTER_G28@g" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*UBL_Z_RAISE_WHEN_OFF_MESH@ UBL_Z_RAISE_WHEN_OFF_MESH@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@#define XY_PROBE_SPEED .*@#define XY_PROBE_SPEED 3000@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 10@g" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@/*#define EXTRAPOLATE_BEYOND_GRID@#define EXTRAPOLATE_BEYOND_GRID@g" ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i "s@/#define HOMING_BUMP_DIVISOR { 2, 2, 4 }@#define HOMING_BUMP_DIVISOR { 1, 1, 1 }@" ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i "s@#define BABYSTEP_MULTIPLICATOR_Z .*@  #define BABYSTEP_MULTIPLICATOR_Z 8@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i "s@#define BABYSTEP_MULTIPLICATOR_XY .*@  #define BABYSTEP_MULTIPLICATOR_XY 5@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i "s@/*#define BABYSTEP_DISPLAY_TOTAL@#define BABYSTEP_DISPLAY_TOTAL@" ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -389,7 +394,7 @@ if [ "$BED_LEVELING" != "MESH_BED_LEVELING" ]; then #It's not manual mesh bed le
 fi
 
 # bltouch probe as z-endstop on z-endstop connector
-sed -i "s@/*#define Z_SAFE_HOMING@#define Z_SAFE_HOMING@" ${MARLIN_DIR}/Marlin/Configuration.h
+# sed -i "s@/*#define Z_SAFE_HOMING@#define Z_SAFE_HOMING@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 echo "PROBE PIN updates"
 # use probe connector as z-endstop connector
